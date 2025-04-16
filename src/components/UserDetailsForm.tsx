@@ -135,7 +135,7 @@ export default function UserDetailsForm({
                         <Textarea
                           placeholder="Write your letter here..."
                           rows={8}
-                          maxLength={500}
+                          maxLength={10000}
                           {...field}
                           onChange={(e) => {
                             field.onChange(e);
@@ -144,7 +144,7 @@ export default function UserDetailsForm({
                           className="pr-16 resize-none min-h-[180px] bg-white/80"
                         />
                         <span className="absolute bottom-2 right-3 text-xs text-muted-foreground bg-white/60 px-1.5 py-0.5 rounded">
-                          {contentLength}/500
+                          {contentLength}/10000
                         </span>
                       </div>
                     </FormControl>
@@ -165,15 +165,15 @@ export default function UserDetailsForm({
                 disabled={submitted || isSubmitting}
               >
                 {isSubmitting
-                  ? "Sending..."
+                  ? "Sharing..."
                   : submitted
-                  ? "Sent!"
-                  : "Send Letter"}
+                  ? "Shared!"
+                  : "Share Letter"}
               </Button>
 
               {submitted && (
                 <div className="text-green-600 text-center font-medium bg-green-50 p-3 rounded-md border border-green-200 mt-3">
-                  Your letter has been sent!
+                  Your letter is Share!
                 </div>
               )}
             </form>

@@ -20,7 +20,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative flex flex-col items-center justify-center min-h-[90vh] px-4 py-12 md:py-20 overflow-hidden">
         {/* Grid background with subtle animation */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute -pt-[1000px] inset-0 z-0 pointer-events-none">
           <div className="absolute inset-0 bg-gradient-to-b from-main/10 via-background/70 to-background z-10" />
           <div className="h-full w-full grid grid-cols-[repeat(24,minmax(0,1fr))] grid-rows-[repeat(24,minmax(0,1fr))] animate-[bg-move_16s_linear_infinite]">
             {Array.from({ length: 24 * 24 }).map((_, i) => (

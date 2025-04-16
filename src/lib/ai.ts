@@ -2,13 +2,9 @@ import dotenv from "dotenv";
 dotenv.config();
 import OpenAI from "openai";
 
-if (!process.env.NEBIUS_API_KEY) {
-  throw new Error("NEBIUS_API_KEY environment variable is not set.");
-}
-
 const client = new OpenAI({
   baseURL: "https://api.studio.nebius.com/v1/",
-  apiKey: process.env.NEBIUS_API_KEY,
+  apiKey: "",
 });
 
 client.chat.completions
