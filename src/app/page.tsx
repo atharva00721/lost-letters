@@ -67,21 +67,12 @@ export default function Home() {
               </svg>
             </Button>
             <Button
-              onClick={() => redirect("/lostletters")}
+              onClick={() => redirect("/lostLetters")}
               variant="neutral"
               size="lg"
               className="text-2xl font-bold px-12 py-8"
             >
-              <span>Learn More</span>
-              <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M12 4v16m0 0l-6-6m6 6l6-6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <span>Lost Letters</span>
             </Button>
           </div>
           {/* Floating elements with more variety and animation */}

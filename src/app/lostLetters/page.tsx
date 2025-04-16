@@ -5,19 +5,72 @@ import Link from "next/link";
 import LetterCard from "@/components/LetterCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
-export default async function LostLettersPage({
-  searchParams,
-}: {
+type Props = {
   searchParams?: { page?: string; search?: string };
-}) {
+};
+
+export default async function LostLettersPage({ searchParams }: Props) {
   const page = parseInt(searchParams?.page || "1", 10);
   const pageSize = 10;
   const searchTerm = searchParams?.search || "";
 
   const result = await getPaginatedLetters(page, pageSize, searchTerm);
   const letters = result.success && result.data ? result.data : [];
-  const totalPages = result.pagination?.totalPages || 1;
+  const pagination = result.pagination || { totalPages: 1 };
+  const totalPages = pagination.totalPages || 1;
+
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      // If there are few pages, show all
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      // Always show first page
+      pageNumbers.push(1);
+
+      if (page > 3) {
+        // Add ellipsis if current page is far from start
+        pageNumbers.push("ellipsis-start");
+      }
+
+      // Pages around current page
+      const startPage = Math.max(2, page - 1);
+      const endPage = Math.min(totalPages - 1, page + 1);
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(i);
+      }
+
+      if (page < totalPages - 2) {
+        // Add ellipsis if current page is far from end
+        pageNumbers.push("ellipsis-end");
+      }
+
+      // Always show last page
+      if (totalPages > 1) {
+        pageNumbers.push(totalPages);
+      }
+    }
+
+    return pageNumbers;
+  };
+
+  const pageNumbers = getPageNumbers();
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-10 max-w-7xl">
@@ -59,26 +112,72 @@ export default async function LostLettersPage({
       )}
 
       {totalPages > 1 && (
-        <div className="flex justify-center gap-3 mt-12 mb-4">
-          {page > 1 && (
-            <Link href={`/lostLetters?page=${page - 1}${
-              searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ""}`.replace(/\s+/,"")}>
-              <Button variant="neutral" className="px-5">
-                Previous
-              </Button>
-            </Link>
-          )}
-          <span className="py-2 px-4 bg-gray-100 rounded-md flex items-center">
-            Page {page} of {totalPages}
-          </span>
-          {page < totalPages && (
-            <Link href={`/lostLetters?page=${page + 1}${
-              searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ""}`.replace(/\s+/,"")}>
-              <Button variant="neutral" className="px-5">
-                Next
-              </Button>
-            </Link>
-          )}
+        <div className="mt-12 mb-4">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                {page > 1 ? (
+                  <PaginationPrevious
+                    href={`/lostLetters?page=${page - 1}${
+                      searchTerm
+                        ? `&search=${encodeURIComponent(searchTerm)}`
+                        : ""
+                    }`}
+                  />
+                ) : (
+                  <PaginationPrevious
+                    href="#"
+                    className="pointer-events-none opacity-50"
+                  />
+                )}
+              </PaginationItem>
+
+              {pageNumbers.map((pageNumber, index) => {
+                if (
+                  pageNumber === "ellipsis-start" ||
+                  pageNumber === "ellipsis-end"
+                ) {
+                  return (
+                    <PaginationItem key={`ellipsis-${index}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                }
+
+                return (
+                  <PaginationItem key={pageNumber}>
+                    <PaginationLink
+                      href={`/lostLetters?page=${pageNumber}${
+                        searchTerm
+                          ? `&search=${encodeURIComponent(searchTerm)}`
+                          : ""
+                      }`}
+                      isActive={page === pageNumber}
+                    >
+                      {pageNumber}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+
+              <PaginationItem>
+                {page < totalPages ? (
+                  <PaginationNext
+                    href={`/lostLetters?page=${page + 1}${
+                      searchTerm
+                        ? `&search=${encodeURIComponent(searchTerm)}`
+                        : ""
+                    }`}
+                  />
+                ) : (
+                  <PaginationNext
+                    href="#"
+                    className="pointer-events-none opacity-50"
+                  />
+                )}
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       )}
     </div>
