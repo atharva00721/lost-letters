@@ -10,11 +10,15 @@ import { Button } from "@/components/ui/button";
 export default async function LostLettersPage({
   searchParams,
 }: {
-  searchParams?: { page?: string; search?: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const page = parseInt(searchParams?.page || "1", 10);
+  const params = searchParams ?? {};
+  const page = parseInt(
+    typeof params.page === "string" ? params.page : "1",
+    10
+  );
   const pageSize = LETTERS_PAGE_SIZE;
-  const searchTerm = searchParams?.search || "";
+  const searchTerm = typeof params.search === "string" ? params.search : "";
 
   const result = await getPaginatedLetters(page, pageSize, searchTerm);
   const letters = result.success && result.data ? result.data : [];
