@@ -7,9 +7,11 @@ import LetterCard from "@/components/LetterCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-type PageProps = {
+// Fixed PageProps type for Next.js App Router pages
+interface PageProps {
+  params: {};
   searchParams: Record<string, string | string[] | undefined>;
-};
+}
 
 export default async function LostLettersPage({ searchParams }: PageProps) {
   const params = searchParams ?? {};
