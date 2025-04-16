@@ -1,7 +1,16 @@
+"use client";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-
+import { redirect } from "next/navigation";
 import MasonryLetterGrid from "@/components/LetterCardDemo";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 
 export default function Home() {
   return (
@@ -20,13 +29,13 @@ export default function Home() {
         {/* Hero content */}
         <div className="relative z-20 flex flex-col items-center text-center max-w-5xl mx-auto">
           <div className="relative mb-8">
-            <div className="absolute -inset-6 rounded-full bg-gradient-to-r from-main/40 via-border/30 to-background blur-2xl animate-pulse" />
+            <div className="absolute -inset-6" />
             <Image
-              src="/file.svg"
+              src="/logo.png"
               alt="Lost Letters Logo"
-              width={120}
-              height={120}
-              className="relative bg-background rounded-full p-7 border-2 border-border shadow-xl"
+              width={220}
+              height={220}
+              className="relative "
               priority
             />
           </div>
@@ -42,6 +51,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-8 mb-16">
             <Button
+              onClick={() => redirect("/writeLetter")}
               size="lg"
               className="text-2xl font-bold px-12 py-8 shadow-lg hover:shadow-2xl transition-all"
             >
@@ -57,6 +67,7 @@ export default function Home() {
               </svg>
             </Button>
             <Button
+              onClick={() => redirect("/lostletters")}
               variant="neutral"
               size="lg"
               className="text-2xl font-bold px-12 py-8"
@@ -133,27 +144,45 @@ export default function Home() {
         <MasonryLetterGrid />
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-16 bg-muted">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <h3 className="text-2xl font-bold mb-8">What people are saying</h3>
-          <div className="space-y-8">
-            <blockquote className="italic text-lg">
-              “A beautiful way to connect with strangers and share stories that
-              matter.”
-              <br />
-              <span className="block mt-2 font-semibold text-base">
-                — Alex R.
-              </span>
-            </blockquote>
-            <blockquote className="italic text-lg">
-              “The minimal design keeps me focused on the words. Love it!”
-              <br />
-              <span className="block mt-2 font-semibold text-base">
-                — Priya S.
-              </span>
-            </blockquote>
-          </div>
+      {/* About Section */}
+      <section className="py-16 bg-background border-t border-border">
+        <div className="relative max-w-3xl mx-auto">
+          {/* Decorative blobs behind card */}
+          {/* <div className="absolute -top-10 -left-10 w-40 h-40 bg-main/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-border/30 rounded-full blur-2xl" /> */}
+          <Card className="relative z-10 bg-white">
+            <CardHeader className="items-center text-center space-y-2">
+              {/* <Mail className="text-main " size={48} /> */}
+              <CardTitle className="text-2xl">About Lost Letters</CardTitle>
+              <CardDescription>Where words find a home</CardDescription>
+            </CardHeader>
+            <CardContent className="px-6 text-center space-y-4 text-muted-foreground">
+              <p>
+                Lost Letters is a cozy corner of the internet where heartfelt
+                messages find their way to the right readers. Whether you write
+                to express, remember, or simply connect, every letter carries a
+                story.
+              </p>
+              <p>
+                Our mission is to create a welcoming space for empathy,
+                inspiration, and the joy of shared experiences. Dive into the
+                collection of letters or pen your own to inspire someone today.
+              </p>
+              <p>
+                Join our community and discover the power of words—one letter at
+                a time.
+              </p>
+            </CardContent>
+            <CardFooter className="justify-center">
+              <Button
+                onClick={() => redirect("/writeLetter")}
+                size="lg"
+                className="font-bold px-8 py-4"
+              >
+                Get Started
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
       </section>
 

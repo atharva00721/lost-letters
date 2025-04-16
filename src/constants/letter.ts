@@ -1,3 +1,5 @@
+export const LETTERS_PAGE_SIZE = 12;
+
 export const MOCK_LETTER = [
   {
     id: 1,

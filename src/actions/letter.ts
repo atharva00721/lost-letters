@@ -139,6 +139,23 @@ export async function getLetters() {
 }
 
 /**
+ * Retrieves a single letter by ID
+ * @param id The ID of the letter to fetch
+ */
+export async function getLetterById(id: string) {
+  try {
+    const letter = await prisma.letter.findUnique({ where: { id } });
+    if (!letter) {
+      return { success: false, error: "Letter not found" };
+    }
+    return { success: true, data: letter };
+  } catch (error) {
+    console.error(`[getLetterById] Failed to fetch letter ${id}:`, error);
+    return { success: false, error: "Failed to fetch letter" };
+  }
+}
+
+/**
  * Updates an existing letter in the database
  * @param id The ID of the letter to update
  * @param data Updated letter data

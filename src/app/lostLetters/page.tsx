@@ -1,70 +1,24 @@
-"use client";
+export const revalidate = 60;
 
-import React, { useEffect, useState } from "react";
+import { getPaginatedLetters } from "@/actions/letter";
+import { LETTERS_PAGE_SIZE } from "@/constants/letter";
+import Link from "next/link";
+import LetterCard from "@/components/LetterCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getPaginatedLetters, searchLetters } from "@/actions/letter";
-import LetterCard from "@/components/LetterCard";
 
-// Define the Letter type based on the prisma schema
-type Letter = {
-  id: string;
-  name: string;
-  message: string;
-  ip: string;
-  createdAt: Date;
-};
+export default async function LostLettersPage({
+  searchParams,
+}: {
+  searchParams?: { page?: string; search?: string };
+}) {
+  const page = parseInt(searchParams?.page || "1", 10);
+  const pageSize = LETTERS_PAGE_SIZE;
+  const searchTerm = searchParams?.search || "";
 
-type Props = {};
-
-const LostLettersPage = (props: Props) => {
-  const [letters, setLetters] = useState<Letter[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 10;
-
-  useEffect(() => {
-    loadLetters();
-  }, [page]);
-
-  const loadLetters = async () => {
-    setLoading(true);
-    const result = await getPaginatedLetters(page, pageSize);
-
-    if (result.success && result.data) {
-      setLetters(result.data);
-      setTotalPages(result.pagination?.totalPages || 1);
-    } else {
-      setLetters([]);
-    }
-    setLoading(false);
-  };
-
-  const handleSearch = async () => {
-    setLoading(true);
-    if (searchTerm.trim() === "") {
-      await loadLetters();
-    } else {
-      const result = await searchLetters(searchTerm);
-      if (result.success && result.data) {
-        setLetters(result.data);
-        // Reset pagination for search results
-        setPage(1);
-        setTotalPages(1);
-      } else {
-        setLetters([]);
-      }
-    }
-    setLoading(false);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
+  const result = await getPaginatedLetters(page, pageSize, searchTerm);
+  const letters = result.success && result.data ? result.data : [];
+  const totalPages = result.pagination?.totalPages || 1;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-10 max-w-7xl">
@@ -72,37 +26,26 @@ const LostLettersPage = (props: Props) => {
         Lost Letters
       </h1>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-10">
+      <form method="get" className="flex flex-col sm:flex-row gap-3 mb-10">
         <Input
+          name="search"
+          defaultValue={searchTerm}
           placeholder="Search by receiver's name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyDown={handleKeyPress}
           className="flex-grow"
         />
         <div className="flex gap-2">
-          <Button onClick={handleSearch} className="px-6">
+          <Button type="submit" className="px-6">
             Search
           </Button>
           {searchTerm && (
-            <Button
-              variant="neutral"
-              onClick={() => {
-                setSearchTerm("");
-                loadLetters();
-              }}
-            >
-              Clear
-            </Button>
+            <Link href="/lostLetters">
+              <Button variant="neutral">Clear</Button>
+            </Link>
           )}
         </div>
-      </div>
+      </form>
 
-      {loading ? (
-        <div className="text-center py-16 text-lg text-gray-500">
-          <div className="animate-pulse">Loading letters...</div>
-        </div>
-      ) : letters.length === 0 ? (
+      {letters.length === 0 ? (
         <div className="text-center py-16 text-lg text-gray-500">
           {searchTerm
             ? `No letters found matching "${searchTerm}"`
@@ -116,32 +59,35 @@ const LostLettersPage = (props: Props) => {
         </div>
       )}
 
-      {/* Pagination controls */}
       {totalPages > 1 && (
         <div className="flex justify-center gap-3 mt-12 mb-4">
-          <Button
-            variant="neutral"
-            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            disabled={page === 1}
-            className="px-5"
-          >
-            Previous
-          </Button>
+          {page > 1 && (
+            <Link
+              href={`/lostLetters?page=${page - 1}${
+                searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ""
+              }`.replace(/\s+/, "")}
+            >
+              <Button variant="neutral" className="px-5">
+                Previous
+              </Button>
+            </Link>
+          )}
           <span className="py-2 px-4 bg-gray-100 rounded-md flex items-center">
             Page {page} of {totalPages}
           </span>
-          <Button
-            variant="neutral"
-            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={page === totalPages}
-            className="px-5"
-          >
-            Next
-          </Button>
+          {page < totalPages && (
+            <Link
+              href={`/lostLetters?page=${page + 1}${
+                searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ""
+              }`.replace(/\s+/, "")}
+            >
+              <Button variant="neutral" className="px-5">
+                Next
+              </Button>
+            </Link>
+          )}
         </div>
       )}
     </div>
   );
-};
-
-export default LostLettersPage;
+}
