@@ -6,7 +6,13 @@ import Link from "next/link";
 import LetterCard from "@/components/LetterCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { PageProps } from "next";
+
+type PageProps = {
+  searchParams: {
+    page?: string;
+    search?: string;
+  };
+};
 
 export default async function LostLettersPage({ searchParams }: PageProps) {
   const params = searchParams ?? {};
