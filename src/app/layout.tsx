@@ -57,6 +57,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1.5,
+  userScalable: true,
 };
 
 export default function RootLayout({
@@ -65,12 +67,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NavigationMenuDemo />
-        <main className="container mx-auto py-6">{children}</main>
+        {/* Added top padding to account for fixed navbar */}
+        <main className="pt-[100px] pb-12 min-h-[calc(100vh-60px)]">
+          {children}
+        </main>
       </body>
     </html>
   );

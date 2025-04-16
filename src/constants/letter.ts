@@ -71,4 +71,18 @@ export const MOCK_LETTER = [
     date: "October 30, 2025",
     content: `Dear Learner,\n\nLife teaches us every day. Listen closely, stay curious, and never stop growing. Wisdom comes from experience, so live fully.\n\nRespectfully,\nThomas`,
   },
+  {
+    id: 11,
+    title: "A Letter to the Future",
+    author: "Jane Doe",
+    date: "April 10, 2025",
+    content: `Dear Reader,\n\nI hope this letter finds you well. The world is changing fast, but kindness and hope remain timeless. Remember to cherish the small moments and write your own story.\n\nWith warmth,\nJane`,
+  },
+  {
+    id: 12,
+    title: "Reflections on Yesterday",
+    author: "John Smith",
+    date: "March 5, 2025",
+    content: `Dear Friend,\n\nLooking back, I see how far we've come. Mistakes were made, but they taught us strength. Keep moving forward, and never forget the lessons of the past.\n\nSincerely,\nJohn`,
+  },
 ];
