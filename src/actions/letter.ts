@@ -126,7 +126,15 @@ export async function getLetters() {
   try {
     // Add a retry mechanism for production database connections
     let retries = 3;
-    let letters;
+    interface Letter {
+      id: string;
+      name: string;
+      message: string;
+      ip: string;
+      createdAt: Date;
+    }
+
+    let letters: Letter[] = []; // Initialize with empty array
 
     while (retries > 0) {
       try {
@@ -138,19 +146,22 @@ export async function getLetters() {
         break; // Success, exit the retry loop
       } catch (retryError) {
         retries--;
-        if (retries === 0) throw retryError; // Last attempt failed, rethrow
         console.log(
           `[getLetters] Retrying database connection (${retries} attempts left)`
         );
+
+        if (retries === 0) {
+          console.error("[getLetters] All retry attempts failed:", retryError);
+          throw retryError; // Last attempt failed, rethrow
+        }
+
         // Wait before retrying
         await new Promise((r) => setTimeout(r, 500));
       }
     }
 
-    console.log(
-      `[getLetters] Successfully fetched ${letters?.length || 0} letters`
-    );
-    return { success: true, data: letters || [] };
+    console.log(`[getLetters] Successfully fetched ${letters.length} letters`);
+    return { success: true, data: letters };
   } catch (error) {
     console.error("[getLetters] Failed to fetch letters:", error);
     return { success: false, error: "Failed to fetch letters" };
@@ -285,7 +296,15 @@ export async function getPaginatedLetters(
     // Add retry mechanism for production
     let retries = 3;
     let totalCount = 0;
-    let letters = [];
+    interface Letter {
+      id: string;
+      name: string;
+      message: string;
+      ip: string;
+      createdAt: Date;
+    }
+
+    let letters: Letter[] = []; // Initialize letters array
 
     while (retries > 0) {
       try {
