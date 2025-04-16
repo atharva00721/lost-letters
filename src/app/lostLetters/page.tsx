@@ -8,10 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 type PageProps = {
-  searchParams: {
-    page?: string;
-    search?: string;
-  };
+  searchParams?: Record<string, string | string[] | undefined>;
 };
 
 export default async function LostLettersPage({ searchParams }: PageProps) {
@@ -21,7 +18,12 @@ export default async function LostLettersPage({ searchParams }: PageProps) {
     10
   );
   const pageSize = LETTERS_PAGE_SIZE;
-  const searchTerm = typeof params.search === "string" ? params.search : "";
+  const searchTerm =
+    typeof params.search === "string"
+      ? params.search
+      : Array.isArray(params.search)
+      ? params.search[0] ?? ""
+      : "";
 
   const result = await getPaginatedLetters(page, pageSize, searchTerm);
   const letters = result.success && result.data ? result.data : [];
