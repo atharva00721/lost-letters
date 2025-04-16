@@ -7,7 +7,6 @@ import LetterCard from "@/components/LetterCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { type Letter } from "@/generated/prisma";
-import { JSX } from "react";
 
 // Define API response types for better type safety
 type PaginationMetadata = {
@@ -26,18 +25,15 @@ type LetterApiResponse = {
   pagination?: PaginationMetadata;
 };
 
-// Next.js App Router page props
-interface PageProps {
-  params: Record<string, string>;
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
 export default async function LostLettersPage({
   searchParams,
-}: PageProps): Promise<JSX.Element> {
+}: {
+  params: {};
+  searchParams?: { [key: string]: string | string[] | undefined };
+}): Promise<JSX.Element> {
   // Parse and validate query parameters
-  const page = parsePageParam(searchParams.page);
-  const searchTerm = parseSearchParam(searchParams.search);
+  const page = parsePageParam(searchParams?.page);
+  const searchTerm = parseSearchParam(searchParams?.search);
   const pageSize = LETTERS_PAGE_SIZE;
 
   // Fetch data with proper typing
