@@ -30,7 +30,7 @@ export default async function LetterDetailPage({ params }: any) {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-10 max-w-3xl">
-      <Button variant="ghost" size="sm" className="mb-6 group" asChild>
+      <Button size="sm" className="mb-6 group" asChild>
         <Link
           href="/lostLetters"
           className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
