@@ -14,7 +14,7 @@ interface Params {
   id: string;
 }
 
-export default async function LetterDetailPage({ params }: { params: Params }) {
+export default async function LetterDetailPage({ params }: any) {
   const { id } = params;
   const result = await getLetterById(id);
   if (!result.success || !result.data) {
