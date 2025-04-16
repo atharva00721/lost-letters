@@ -1,82 +1,108 @@
-import Link from "next/link";
-import { getPaginatedLetters } from "@/actions/letter";
+"use client";
 
-import LetterCard from "@/components/LetterCard";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { getPaginatedLetters, searchLetters } from "@/actions/letter";
+import LetterCard from "@/components/LetterCard";
 
-/* ------------------------------------------------------------------ */
-/* Types                                                               */
-/* ------------------------------------------------------------------ */
-type Props = {
-  // fully compatible with Next's built‑in `PageProps`
-  searchParams?: Record<string, string | string[]>;
+// Define the Letter type based on the prisma schema
+type Letter = {
+  id: string;
+  name: string;
+  message: string;
+  ip: string;
+  createdAt: Date;
 };
 
-export const revalidate = 60; // ISR every 60 s
+type Props = {};
 
-/* ------------------------------------------------------------------ */
-/* Component                                                           */
-/* ------------------------------------------------------------------ */
-export default async function LostLettersPage({ searchParams }: Props) {
-  /* --------- query helpers --------- */
-  const rawPage = searchParams?.page;
-  const rawSearch = searchParams?.search;
-
-  const page = parseInt(
-    Array.isArray(rawPage) ? rawPage[0] ?? "1" : rawPage ?? "1",
-    10
-  );
+const LostLettersPage = (props: Props) => {
+  const [letters, setLetters] = useState<Letter[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const pageSize = 10;
-  const searchTerm = Array.isArray(rawSearch)
-    ? rawSearch[0] ?? ""
-    : rawSearch ?? "";
 
-  /* --------- data fetch ---------- */
-  const result = await getPaginatedLetters(page, pageSize, searchTerm);
+  useEffect(() => {
+    loadLetters();
+  }, [page]);
 
-  const letters = result.success && result.data ? result.data : [];
-  const totalPages = result.pagination?.totalPages ?? 1;
-  const pageNumbers = computePageNumbers(page, totalPages);
+  const loadLetters = async () => {
+    setLoading(true);
+    const result = await getPaginatedLetters(page, pageSize);
 
-  /* --------- render ---------- */
+    if (result.success && result.data) {
+      setLetters(result.data);
+      setTotalPages(result.pagination?.totalPages || 1);
+    } else {
+      setLetters([]);
+    }
+    setLoading(false);
+  };
+
+  const handleSearch = async () => {
+    setLoading(true);
+    if (searchTerm.trim() === "") {
+      await loadLetters();
+    } else {
+      const result = await searchLetters(searchTerm);
+      if (result.success && result.data) {
+        setLetters(result.data);
+        // Reset pagination for search results
+        setPage(1);
+        setTotalPages(1);
+      } else {
+        setLetters([]);
+      }
+    }
+    setLoading(false);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 sm:px-6 py-10 max-w-7xl">
       <h1 className="text-4xl font-bold mb-8 text-center sm:text-left">
         Lost Letters
       </h1>
 
-      {/* ---------- Search bar ---------- */}
-      <form method="get" className="flex flex-col sm:flex-row gap-3 mb-10">
+      <div className="flex flex-col sm:flex-row gap-3 mb-10">
         <Input
-          name="search"
-          defaultValue={searchTerm}
           placeholder="Search by receiver's name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={handleKeyPress}
           className="flex-grow"
         />
         <div className="flex gap-2">
-          <Button type="submit" className="px-6">
+          <Button onClick={handleSearch} className="px-6">
             Search
           </Button>
           {searchTerm && (
-            <Link href="/lostLetters">
-              <Button variant="neutral">Clear</Button>
-            </Link>
+            <Button
+              variant="neutral"
+              onClick={() => {
+                setSearchTerm("");
+                loadLetters();
+              }}
+            >
+              Clear
+            </Button>
           )}
         </div>
-      </form>
+      </div>
 
-      {/* ---------- List / Empty state ---------- */}
-      {letters.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-16 text-lg text-gray-500">
+          <div className="animate-pulse">Loading letters...</div>
+        </div>
+      ) : letters.length === 0 ? (
         <div className="text-center py-16 text-lg text-gray-500">
           {searchTerm
             ? `No letters found matching "${searchTerm}"`
@@ -90,91 +116,32 @@ export default async function LostLettersPage({ searchParams }: Props) {
         </div>
       )}
 
-      {/* ---------- Pagination ---------- */}
+      {/* Pagination controls */}
       {totalPages > 1 && (
-        <div className="mt-12 mb-4">
-          <Pagination>
-            <PaginationContent>
-              {/* Previous */}
-              <PaginationItem>
-                {page > 1 ? (
-                  <PaginationPrevious href={buildHref(page - 1, searchTerm)} />
-                ) : (
-                  <PaginationPrevious
-                    href="#"
-                    className="pointer-events-none opacity-50"
-                  />
-                )}
-              </PaginationItem>
-
-              {/* Page numbers / ellipses */}
-              {pageNumbers.map((num, idx) =>
-                typeof num === "number" ? (
-                  <PaginationItem key={num}>
-                    <PaginationLink
-                      href={buildHref(num, searchTerm)}
-                      isActive={page === num}
-                    >
-                      {num}
-                    </PaginationLink>
-                  </PaginationItem>
-                ) : (
-                  <PaginationItem key={`ellipsis-${idx}`}>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                )
-              )}
-
-              {/* Next */}
-              <PaginationItem>
-                {page < totalPages ? (
-                  <PaginationNext href={buildHref(page + 1, searchTerm)} />
-                ) : (
-                  <PaginationNext
-                    href="#"
-                    className="pointer-events-none opacity-50"
-                  />
-                )}
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+        <div className="flex justify-center gap-3 mt-12 mb-4">
+          <Button
+            variant="neutral"
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className="px-5"
+          >
+            Previous
+          </Button>
+          <span className="py-2 px-4 bg-gray-100 rounded-md flex items-center">
+            Page {page} of {totalPages}
+          </span>
+          <Button
+            variant="neutral"
+            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={page === totalPages}
+            className="px-5"
+          >
+            Next
+          </Button>
         </div>
       )}
     </div>
   );
-}
+};
 
-/* ------------------------------------------------------------------ */
-/* Utilities                                                           */
-/* ------------------------------------------------------------------ */
-function computePageNumbers(
-  current: number,
-  total: number
-): (number | "ellipsis-start" | "ellipsis-end")[] {
-  const out: (number | "ellipsis-start" | "ellipsis-end")[] = [];
-  const maxVisible = 5;
-
-  if (total <= maxVisible) {
-    for (let i = 1; i <= total; i++) out.push(i);
-    return out;
-  }
-
-  out.push(1); // always first
-
-  if (current > 3) out.push("ellipsis-start");
-
-  const start = Math.max(2, current - 1);
-  const end = Math.min(total - 1, current + 1);
-  for (let i = start; i <= end; i++) out.push(i);
-
-  if (current < total - 2) out.push("ellipsis-end");
-
-  out.push(total); // always last
-  return out;
-}
-
-function buildHref(page: number, search: string) {
-  return `/lostLetters?page=${page}${
-    search ? `&search=${encodeURIComponent(search)}` : ""
-  }`;
-}
+export default LostLettersPage;
