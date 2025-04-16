@@ -7,6 +7,7 @@ import LetterCard from "@/components/LetterCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { type Letter } from "@/generated/prisma";
+import { JSX } from "react";
 
 // Define API response types for better type safety
 type PaginationMetadata = {
