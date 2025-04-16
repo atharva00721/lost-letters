@@ -124,14 +124,33 @@ export async function getLetters() {
   console.log("[getLetters] Fetching all letters");
 
   try {
-    const letters = await prisma.letter.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    // Add a retry mechanism for production database connections
+    let retries = 3;
+    let letters;
 
-    console.log(`[getLetters] Successfully fetched ${letters.length} letters`);
-    return { success: true, data: letters };
+    while (retries > 0) {
+      try {
+        letters = await prisma.letter.findMany({
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+        break; // Success, exit the retry loop
+      } catch (retryError) {
+        retries--;
+        if (retries === 0) throw retryError; // Last attempt failed, rethrow
+        console.log(
+          `[getLetters] Retrying database connection (${retries} attempts left)`
+        );
+        // Wait before retrying
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+
+    console.log(
+      `[getLetters] Successfully fetched ${letters?.length || 0} letters`
+    );
+    return { success: true, data: letters || [] };
   } catch (error) {
     console.error("[getLetters] Failed to fetch letters:", error);
     return { success: false, error: "Failed to fetch letters" };
@@ -263,18 +282,37 @@ export async function getPaginatedLetters(
         }
       : {};
 
-    // Get total count for pagination
-    const totalCount = await prisma.letter.count({ where });
+    // Add retry mechanism for production
+    let retries = 3;
+    let totalCount = 0;
+    let letters = [];
 
-    // Get paginated data
-    const letters = await prisma.letter.findMany({
-      where,
-      orderBy: {
-        createdAt: "desc",
-      },
-      skip,
-      take: pageSize,
-    });
+    while (retries > 0) {
+      try {
+        // Get total count for pagination
+        totalCount = await prisma.letter.count({ where });
+
+        // Get paginated data
+        letters = await prisma.letter.findMany({
+          where,
+          orderBy: {
+            createdAt: "desc",
+          },
+          skip,
+          take: pageSize,
+        });
+
+        break; // Success, exit retry loop
+      } catch (retryError) {
+        retries--;
+        if (retries === 0) throw retryError; // Last attempt failed, rethrow
+        console.log(
+          `[getPaginatedLetters] Retrying database connection (${retries} attempts left)`
+        );
+        // Wait before retrying
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
 
     const totalPages = Math.ceil(totalCount / pageSize);
 

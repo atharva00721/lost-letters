@@ -30,15 +30,41 @@ const LostLettersPage = () => {
 
   const loadLetters = async () => {
     setLoading(true);
-    const result = await getPaginatedLetters(page, pageSize);
 
-    if (result.success && result.data) {
-      setLetters(result.data);
-      setTotalPages(result.pagination?.totalPages || 1);
-    } else {
+    try {
+      // Add a retry mechanism on the client side too
+      let attempts = 2;
+      let result;
+
+      while (attempts > 0) {
+        result = await getPaginatedLetters(page, pageSize);
+
+        if (result.success) {
+          break; // Success, exit retry loop
+        } else {
+          attempts--;
+          if (attempts === 0) break; // Last attempt failed
+
+          // Wait before retrying
+          await new Promise((r) => setTimeout(r, 1000));
+        }
+      }
+
+      if (result?.success && result?.data) {
+        setLetters(result.data);
+        setTotalPages(result.pagination?.totalPages || 1);
+      } else {
+        console.error("Failed to load letters:", result?.error);
+        setLetters([]);
+        // Show an error message to the user
+        // The existing empty state UI will show
+      }
+    } catch (error) {
+      console.error("Error in loadLetters:", error);
       setLetters([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleSearch = async () => {

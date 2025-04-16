@@ -2,9 +2,12 @@ import dotenv from "dotenv";
 dotenv.config();
 import OpenAI from "openai";
 
+
+
 const client = new OpenAI({
   baseURL: "https://api.studio.nebius.com/v1/",
-  apiKey: "",
+  apiKey:
+    "eyJhbGciOiJIUzI1NiIsImtpZCI6IlV6SXJWd1h0dnprLVRvdzlLZWstc0M1akptWXBvX1VaVkxUZlpnMDRlOFUiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJnb29nbGUtb2F1dGgyfDExMjc5ODQ3Njg5MzkyNTI0ODM3OCIsInNjb3BlIjoib3BlbmlkIG9mZmxpbmVfYWNjZXNzIiwiaXNzIjoiYXBpX2tleV9pc3N1ZXIiLCJhdWQiOlsiaHR0cHM6Ly9uZWJpdXMtaW5mZXJlbmNlLmV1LmF1dGgwLmNvbS9hcGkvdjIvIl0sImV4cCI6MTkwMjUyMDYxMCwidXVpZCI6ImEzZWJjY2JjLTZmYzItNDk3ZS04ZTg5LTEwMDEwMzJkOTA1YyIsIm5hbWUiOiJMb3N0bGV0dGVycy1TcGFtIiwiZXhwaXJlc19hdCI6IjIwMzAtMDQtMTVUMjE6NTY6NTArMDAwMCJ9.zmAMJE2q4_dldNIQUK-GbXE331FIG6WY6XqexZtPGOw",
 });
 
 client.chat.completions

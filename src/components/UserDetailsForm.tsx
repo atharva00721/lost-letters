@@ -135,7 +135,7 @@ export default function UserDetailsForm({
                         <Textarea
                           placeholder="Write your letter here..."
                           rows={8}
-                          maxLength={10000}
+                          maxLength={500}
                           {...field}
                           onChange={(e) => {
                             field.onChange(e);
@@ -144,7 +144,7 @@ export default function UserDetailsForm({
                           className="pr-16 resize-none min-h-[180px] bg-white/80"
                         />
                         <span className="absolute bottom-2 right-3 text-xs text-muted-foreground bg-white/60 px-1.5 py-0.5 rounded">
-                          {contentLength}/10000
+                          {contentLength}/500
                         </span>
                       </div>
                     </FormControl>
