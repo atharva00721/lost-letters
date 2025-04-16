@@ -15,9 +15,7 @@ type Letter = {
   createdAt: Date;
 };
 
-type Props = {};
-
-const LostLettersPage = (props: Props) => {
+const LostLettersPage = () => {
   const [letters, setLetters] = useState<Letter[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
