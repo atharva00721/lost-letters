@@ -69,13 +69,8 @@ export default function UserDetailsForm({
         form.reset();
         setContentLength(0);
         setTimeout(() => setSubmitted(false), 2500);
-      } else if (result.error === "Rate limit exceeded") {
-        // Handle rate limit error
-        setErrorMessage(
-          result.message || "You can only post once every 6 hours."
-        );
       } else {
-        // Handle other errors
+        // Handle generic errors
         setErrorMessage(
           "Failed to submit your letter. Please try again later."
         );

@@ -11,53 +11,15 @@ interface LetterData {
 }
 
 /**
- * Creates a new letter in the database, with rate limiting
- * Users can only post once every 6 hours from the same IP address
+ * Creates a new letter in the database
  *
  * @param data Letter data containing name, message, and IP address
- * @returns The created letter object or error if rate limited
+ * @returns The created letter object
  */
 export async function createLetter(data: LetterData) {
   console.log(`[createLetter] Attempting to create letter for IP: ${data.ip}`);
 
   try {
-    // Check if this IP has posted in the last 6 hours
-    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
-    console.log(
-      `[createLetter] Checking for posts since: ${sixHoursAgo.toISOString()}`
-    );
-
-    const recentPost = await prisma.letter.findFirst({
-      where: {
-        ip: data.ip,
-        createdAt: {
-          gte: sixHoursAgo,
-        },
-      },
-    });
-
-    // If a recent post exists from this IP, return an error
-    if (recentPost) {
-      const waitTime = calculateWaitTime(recentPost.createdAt);
-      const timeRemaining = getTimeRemainingMs(recentPost.createdAt);
-
-      console.log(
-        `[createLetter] Rate limit exceeded for IP: ${
-          data.ip
-        }. Previous post at: ${recentPost.createdAt.toISOString()}`
-      );
-      console.log(
-        `[createLetter] Time remaining: ${timeRemaining}ms (${waitTime})`
-      );
-
-      return {
-        success: false,
-        error: "Rate limit exceeded",
-        message: `You can only post once every 6 hours. Please try again in ${waitTime}.`,
-        timeRemaining: timeRemaining,
-      };
-    }
-
     // Create new letter in database
     console.log(
       `[createLetter] Creating new letter from: ${data.name} (IP: ${data.ip})`
@@ -83,37 +45,6 @@ export async function createLetter(data: LetterData) {
     console.error("[createLetter] Failed to create letter:", error);
     return { success: false, error: "Failed to create letter" };
   }
-}
-
-/**
- * Calculate readable wait time string
- */
-function calculateWaitTime(postTime: Date): string {
-  const remainingMs = getTimeRemainingMs(postTime);
-
-  if (remainingMs <= 0) return "a moment";
-
-  const hours = Math.floor(remainingMs / (1000 * 60 * 60));
-  const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-
-  if (hours > 0) {
-    return `${hours} hour${hours !== 1 ? "s" : ""} and ${minutes} minute${
-      minutes !== 1 ? "s" : ""
-    }`;
-  } else {
-    return `${minutes} minute${minutes !== 1 ? "s" : ""}`;
-  }
-}
-
-/**
- * Get remaining milliseconds until 6 hours from post time
- */
-function getTimeRemainingMs(postTime: Date): number {
-  const sixHoursInMs = 6 * 60 * 60 * 1000;
-  const postTimeMs = postTime.getTime();
-  const now = Date.now();
-
-  return Math.max(0, postTimeMs + sixHoursInMs - now);
 }
 
 /**
