@@ -41,6 +41,7 @@ export default function UserDetailsForm({
   const [submitted, setSubmitted] = useState(false);
   const [contentLength, setContentLength] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [warningMessage, setWarningMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -54,9 +55,10 @@ export default function UserDetailsForm({
   async function handleFormSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     setErrorMessage(null);
+    setWarningMessage(null);
 
     try {
-      // Call our server action
+      // Call our server action with content moderation
       const result = await createLetter({
         name: values.receiver,
         message: values.content,
@@ -65,15 +67,35 @@ export default function UserDetailsForm({
 
       if (result.success) {
         setSubmitted(true);
+
+        // Check if content was filtered and show warning if it was
+        if (result.wasContentFiltered && result.message) {
+          setWarningMessage(result.message);
+        }
+
         if (onSubmit) onSubmit(values);
         form.reset();
         setContentLength(0);
         setTimeout(() => setSubmitted(false), 2500);
       } else {
-        // Handle generic errors
-        setErrorMessage(
-          "Failed to submit your letter. Please try again later."
-        );
+        // Handle specific moderation errors
+        if (result.moderationDetails) {
+          let errorMsg =
+            result.error || "Your message contains inappropriate content";
+
+          // Add more specific details if available
+          if (result.moderationDetails.message) {
+            errorMsg += `: ${result.moderationDetails.message}`;
+          }
+
+          setErrorMessage(errorMsg);
+        } else {
+          // Handle generic errors
+          setErrorMessage(
+            result.error ||
+              "Failed to submit your letter. Please try again later."
+          );
+        }
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -154,6 +176,12 @@ export default function UserDetailsForm({
                 </div>
               )}
 
+              {warningMessage && (
+                <div className="text-amber-600 text-sm font-medium p-3 bg-amber-50 rounded-md border border-amber-200">
+                  {warningMessage}
+                </div>
+              )}
+
               <Button
                 type="submit"
                 className="w-full text-lg py-6 font-semibold transition-all shadow-sm hover:shadow-md"
@@ -168,7 +196,7 @@ export default function UserDetailsForm({
 
               {submitted && (
                 <div className="text-green-600 text-center font-medium bg-green-50 p-3 rounded-md border border-green-200 mt-3">
-                  Your letter is Share!
+                  Your letter has been shared!
                 </div>
               )}
             </form>

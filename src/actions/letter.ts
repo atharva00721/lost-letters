@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { moderateContent } from "@/lib/gemini";
 
 // Type definition for letter data
 interface LetterData {
@@ -14,21 +15,50 @@ interface LetterData {
  * Creates a new letter in the database
  *
  * @param data Letter data containing name, message, and IP address
- * @returns The created letter object
+ * @returns The created letter object or moderation error
  */
 export async function createLetter(data: LetterData) {
   console.log(`[createLetter] Attempting to create letter for IP: ${data.ip}`);
 
   try {
-    // Create new letter in database
+    // First, moderate the content using Gemini AI
+    console.log(`[createLetter] Moderating content for letter from: ${data.name}`);
+    
+    // Check name for inappropriate content
+    const nameModeration = await moderateContent(data.name);
+    if (!nameModeration.isValid) {
+      console.log(`[createLetter] Name rejected by content moderation: ${nameModeration.message}`);
+      return { 
+        success: false, 
+        error: "Your name contains inappropriate content",
+        moderationDetails: nameModeration 
+      };
+    }
+    
+    // Check message for inappropriate content
+    const messageModeration = await moderateContent(data.message);
+    if (!messageModeration.isValid) {
+      console.log(`[createLetter] Message rejected by content moderation: ${messageModeration.message}`);
+      return { 
+        success: false, 
+        error: "Your message contains inappropriate content", 
+        moderationDetails: messageModeration 
+      };
+    }
+    
+    // Use filtered versions of name and message if they were modified
+    const filteredName = nameModeration.filteredText;
+    const filteredMessage = messageModeration.filteredText;
+    
+    // Create new letter in database with filtered content
     console.log(
-      `[createLetter] Creating new letter from: ${data.name} (IP: ${data.ip})`
+      `[createLetter] Creating new letter from: ${filteredName} (IP: ${data.ip})`
     );
 
     const letter = await prisma.letter.create({
       data: {
-        name: data.name,
-        message: data.message,
+        name: filteredName,
+        message: filteredMessage,
         ip: data.ip,
       },
     });
@@ -40,7 +70,19 @@ export async function createLetter(data: LetterData) {
     // Revalidate the path to update the UI
     revalidatePath("/");
 
-    return { success: true, data: letter };
+    // If content was filtered but still acceptable, include a warning
+    const wasContentFiltered = 
+      filteredName !== data.name || 
+      filteredMessage !== data.message;
+    
+    return { 
+      success: true, 
+      data: letter,
+      wasContentFiltered,
+      message: wasContentFiltered ? 
+        "Your message was filtered to remove potentially inappropriate content" : 
+        undefined
+    };
   } catch (error) {
     console.error("[createLetter] Failed to create letter:", error);
     return { success: false, error: "Failed to create letter" };
