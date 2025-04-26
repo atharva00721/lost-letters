@@ -10,6 +10,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface Params {
   id: string;
@@ -42,11 +43,26 @@ export default async function LetterDetailPage({ params }: any) {
 
       <Card className="bg-white/70 backdrop-blur-sm border-opacity-50 shadow-sm hover:shadow transition-shadow">
         <CardHeader className="pb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <CardTitle className="text-2xl font-bold">
-              To: {letter.name}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">{formattedDate}</p>
+          <div className="flex items-center gap-4">
+            <Image
+              src="/icons/icon1.jpg"
+              alt="avatar"
+              width={48}
+              height={48}
+              className="rounded-full border bg-white shadow-sm"
+            />
+            <div className="flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <CardTitle className="text-2xl font-bold">
+                  To: {letter.name}
+                </CardTitle>
+                <div className="flex items-center gap-3">
+                  <p className="text-sm text-muted-foreground">
+                    {formattedDate}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </CardHeader>
 
