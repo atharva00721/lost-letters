@@ -70,7 +70,7 @@ export default async function LetterDetailPage({
         </Link>
       </Button>
 
-      <Card className="bg-white/80 backdrop-blur-sm border-opacity-60 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden max-w-2xl mx-auto">
+      <Card className="bg-white/80 backdrop-blur-sm border-opacity-60 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden max-w-3xl mx-auto">
         {/* Letter paper texture overlay */}
         <div className="absolute inset-0 opacity-8 bg-gradient-to-br from-gray-100 via-transparent to-gray-200 pointer-events-none" />
 

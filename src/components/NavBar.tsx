@@ -5,12 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
-
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
@@ -65,7 +59,7 @@ export default function NavBar() {
               className=""
             />
           </div>
-          <span className="font-semibold text-base sm:text-lg text-foreground/80 group-hover:text-foreground transition-colors">
+          <span className="font-serif tracking-wide text-base sm:text-2xl text-foreground/80 group-hover:text-foreground transition-colors">
             Lost Letters
           </span>
         </Link>

@@ -9,6 +9,7 @@ import {
   LetterGrid,
   InfiniteScroll,
 } from "@/components/lostLetters";
+import LetterCountClient from "@/components/LetterCountClient";
 
 const LostLettersContent = () => {
   const {
@@ -34,9 +35,12 @@ const LostLettersContent = () => {
 
   return (
     <div className="container mt-20 mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-7xl">
-      <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center sm:text-left">
-        Lost Letters
-      </h1>
+      <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start mb-6 sm:mb-8">
+        <h1 className="text-3xl sm:text-4xl font-serif tracking-wide text-center sm:text-left">
+          Lost Letters
+        </h1>
+        <LetterCountClient />
+      </div>
 
       <SearchBar
         searchTerm={searchTerm}
@@ -79,9 +83,12 @@ const LostLettersPage = () => {
     <Suspense
       fallback={
         <div className="container mt-20 mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-7xl">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center sm:text-left">
-            Lost Letters
-          </h1>
+          <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start mb-6 sm:mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-center sm:text-left">
+              Lost Letters
+            </h1>
+            <LetterCountClient />
+          </div>
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
           </div>

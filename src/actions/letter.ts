@@ -74,6 +74,9 @@ export async function createLetter(data: LetterData) {
       `[createLetter] Letter created successfully with ID: ${letter.id}`
     );
 
+    // Invalidate letter count cache
+    letterCountCache = null;
+
     // Revalidate the paths to update the UI
     revalidatePath("/");
     revalidatePath("/lostLetters");
@@ -233,6 +236,65 @@ export async function searchLetters(searchTerm: string) {
   } catch (error) {
     console.error("[searchLetters] Failed to search letters:", error);
     return { success: false, error: "Failed to search letters" };
+  }
+}
+
+// Cache for letter count with timestamp
+let letterCountCache: { count: number; timestamp: number } | null = null;
+const LETTER_COUNT_CACHE_DURATION = 60000; // 1 minute
+
+/**
+ * Gets the total count of letters in the database
+ * @returns The total number of letters
+ */
+export async function getLetterCount() {
+  // Check if we have a valid cached count
+  if (
+    letterCountCache &&
+    Date.now() - letterCountCache.timestamp < LETTER_COUNT_CACHE_DURATION
+  ) {
+    console.log(
+      `[getLetterCount] Using cached count: ${letterCountCache.count}`
+    );
+    return { success: true, count: letterCountCache.count };
+  }
+
+  console.log("[getLetterCount] Fetching total letter count from database");
+
+  try {
+    let retries = 3;
+    let count = 0;
+
+    while (retries > 0) {
+      try {
+        count = await prisma.letter.count();
+        break; // Success, exit the retry loop
+      } catch (retryError) {
+        retries--;
+        console.log(
+          `[getLetterCount] Retrying database connection (${retries} attempts left)`
+        );
+
+        if (retries === 0) {
+          console.error(
+            "[getLetterCount] All retry attempts failed:",
+            retryError
+          );
+          throw retryError; // Last attempt failed, rethrow
+        }
+
+        // Wait before retrying
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+
+    // Update cache
+    letterCountCache = { count, timestamp: Date.now() };
+    console.log(`[getLetterCount] Successfully fetched count: ${count}`);
+    return { success: true, count };
+  } catch (error) {
+    console.error("[getLetterCount] Failed to fetch letter count:", error);
+    return { success: false, error: "Failed to fetch letter count", count: 0 };
   }
 }
 
