@@ -62,7 +62,7 @@ export function SearchBar({
         )}
       </div>
       <div id="search-help" className="sr-only">
-        Search through letters by the recipient's name or message content
+        Search through letters by the recipient&apos;s name or message content
       </div>
       <Button
         onClick={onSearch}

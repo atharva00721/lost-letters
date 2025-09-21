@@ -33,19 +33,19 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // Persistent cache using sessionStorage
-  const getCacheKey = (searchTerm: string) =>
-    `lostLetters_${searchTerm || "default"}`;
+  const getCacheKey = useCallback((searchTerm: string) =>
+    `lostLetters_${searchTerm || "default"}`, []);
 
-  const getCachedData = (searchTerm: string) => {
+  const getCachedData = useCallback((searchTerm: string) => {
     try {
       const cached = sessionStorage.getItem(getCacheKey(searchTerm));
       return cached ? JSON.parse(cached) : null;
     } catch {
       return null;
     }
-  };
+  }, [getCacheKey]);
 
-  const setCachedData = (
+  const setCachedData = useCallback((
     searchTerm: string,
     data: {
       letters: Letter[];
@@ -58,15 +58,15 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
     } catch {
       // Ignore storage errors
     }
-  };
+  }, [getCacheKey]);
 
-  const clearCache = (searchTerm: string) => {
+  const clearCache = useCallback((searchTerm: string) => {
     try {
       sessionStorage.removeItem(getCacheKey(searchTerm));
     } catch {
       // Ignore storage errors
     }
-  };
+  }, [getCacheKey]);
 
   // Debounce the search term
   useEffect(() => {
@@ -77,7 +77,7 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
   }, [searchTerm]);
 
   // Helper to build and set URL params
-  const updateUrl = (nextPage: number, nextQuery: string, replace = false) => {
+  const updateUrl = useCallback((nextPage: number, nextQuery: string, replace = false) => {
     const params = new URLSearchParams();
     if (nextQuery) params.set("q", nextQuery);
     if (nextPage > 1) params.set("page", String(nextPage));
@@ -86,7 +86,7 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
       : pathname;
     if (replace) router.replace(url);
     else router.push(url);
-  };
+  }, [pathname, router]);
 
   // Fetch a page of data
   const fetchPage = useCallback(
@@ -174,7 +174,7 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
         }
       }
     },
-    [pageSize]
+    [pageSize, setCachedData, clearCache]
   );
 
   // Handle search term changes (debounced) and initial load
@@ -197,7 +197,7 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
         fetchPage(1, debouncedSearchTerm, { append: false });
       });
     }
-  }, [debouncedSearchTerm, fetchPage]);
+  }, [debouncedSearchTerm, fetchPage, getCachedData, updateUrl]);
 
   // Load more when page increases (infinite scroll / manual load)
   useEffect(() => {
