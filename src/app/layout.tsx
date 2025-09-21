@@ -1,22 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 
 import "../styles/globals.css";
 import NavigationMenuDemo from "@/components/NavBar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
   subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
 });
 
 /* ---------- metadata ---------- */
 export const metadata: Metadata = {
-  title: "Lost Letters – Share Your Stories",
+  title: "Lost Letters - Share Your Stories",
   description:
     "Lost Letters is a platform to share, discover, and save heartfelt letters from around the world.",
   keywords: ["lost letters", "letters", "journal", "stories", "share letters"],
@@ -69,13 +71,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${instrumentSans.variable} ${instrumentSerif.variable} antialiased`}
       >
         <NavigationMenuDemo />
         {/* Added top padding to account for fixed navbar */}
-        <main className="min-h-[calc(100vh-60px)]">
-          {children}
-        </main>
+        <main className="min-h-[calc(100vh-60px)]">{children}</main>
       </body>
     </html>
   );

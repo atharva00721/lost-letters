@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatLetterTitle } from "@/lib/utils";
 
 import { Metadata } from "next";
 
@@ -69,37 +70,42 @@ export default async function LetterDetailPage({
         </Link>
       </Button>
 
-      <Card className="bg-white/70 backdrop-blur-sm border-opacity-50 shadow-sm hover:shadow transition-shadow relative overflow-hidden">
+      <Card className="bg-white/80 backdrop-blur-sm border-opacity-60 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden max-w-2xl mx-auto">
         {/* Letter paper texture overlay */}
-        <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-gray-200 via-transparent to-gray-300 pointer-events-none" />
+        <div className="absolute inset-0 opacity-8 bg-gradient-to-br from-gray-100 via-transparent to-gray-200 pointer-events-none" />
 
-        <CardHeader className="pt-8 px-8 relative">
-          {/* Letter greeting */}
+        {/* Subtle border styling */}
+        <div className="absolute inset-0 border-2 border-gray-300/30 rounded-lg pointer-events-none" />
+
+        <CardHeader className="pt-12 px-12 relative">
+          {/* Letter greeting - larger, italic title */}
           <div className="pb-1">
-            <CardTitle className="text-2xl font-serif text-foreground">
-              {letter.name},
+            <CardTitle className="text-3xl letter-title text-foreground leading-tight">
+              {formatLetterTitle(letter.name)}
             </CardTitle>
           </div>
-          {/* Date in top-right corner like a traditional letter */}
-          <div className="text-left text-sm text-muted-foreground">
+          {/* Date - bold, positioned like traditional letter */}
+          <div className="text-left text-base letter-date text-foreground">
             {formattedDate}
           </div>
         </CardHeader>
 
-        <CardContent className="px-8 pb-8 relative">
+        <CardContent className="px-12 pb-12 relative">
           {/* Letter content with proper spacing */}
-          <div className="space-y-6">
-            <div className="text-base sm:text-lg leading-relaxed font-serif text-foreground whitespace-pre-wrap">
+          <div className="space-y-8">
+            <div className="text-3xl sm:text-4xl letter-body text-foreground whitespace-pre-wrap">
               {letter.message}
             </div>
 
-            {/* Letter signature area */}
-            <div className="pt-6">
-              <div className="text-right">
-                <div className="text-sm text-muted-foreground italic mb-2">
+            {/* Letter signature area - right aligned */}
+            <div className="pt-8">
+              <div className="text-right -space-y-1">
+                <div className="text-lg letter-signature text-foreground">
                   Sincerely,
                 </div>
-                <div className="text-sm text-muted-foreground">Anonymous</div>
+                <div className="text-base font-normal text-foreground">
+                  Anonymous
+                </div>
               </div>
             </div>
           </div>

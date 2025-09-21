@@ -35,7 +35,8 @@
   --color-border: var(--border);
   --color-overlay: var(--overlay);
   --color-ring: var(--ring);
-
+  --font-instrument-sans: var(--font-instrument-sans);
+  --font-instrument-serif: var(--font-instrument-serif);
   --spacing-boxShadowX: 2px;
   --spacing-boxShadowY: 2px;
   --spacing-reverseBoxShadowX: -2px;
@@ -49,6 +50,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    font-family: var(--font-instrument-sans), sans-sans;
   }
 
   body {
@@ -170,6 +172,38 @@
 .envelope-flap {
   transform-style: preserve-3d;
   backface-visibility: hidden;
+}
+
+.font-serif {
+  font-family:var(--font-instrument-serif), serif;
+}
+
+/* Letter-specific typography enhancements */
+.letter-title {
+  font-family: var(--font-instrument-serif), serif;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+
+.letter-date {
+  font-family: var(--font-instrument-serif), serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.letter-body {
+  font-family: var(--font-instrument-serif), serif;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+.letter-signature {
+  font-family: var(--font-instrument-serif), serif;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.01em;
 }
 
 @keyframes envelope-open {
