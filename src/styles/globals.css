@@ -160,3 +160,40 @@
 .animate-float-slow-reverse {
   animation: float-slow-reverse 6s ease-in-out infinite;
 }
+
+/* Envelope 3D Effects */
+.envelope-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.envelope-flap {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+@keyframes envelope-open {
+  0% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(-120deg);
+  }
+}
+
+@keyframes envelope-close {
+  0% {
+    transform: rotateX(-120deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+.animate-envelope-open {
+  animation: envelope-open 0.6s ease-out forwards;
+}
+
+.animate-envelope-close {
+  animation: envelope-close 0.6s ease-out forwards;
+}
