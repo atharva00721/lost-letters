@@ -7,7 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "bun prisma/seed.ts"
+    "seed": "bun prisma/seed.ts",
+    "seed-csv": "bun prisma/seed-csv.ts"
   },
   "prisma": {
     "seed": "bun prisma/seed.ts"
