@@ -52,53 +52,47 @@ export default function NavBar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-primary/10 transition-all duration-200">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-b border-foreground/10">
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         {/* Logo and site name */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative overflow-hidden rounded-md">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative overflow-hidden ">
             <Image
-              src="/logo.png"
+              src="/icon.png"
               alt="Lost Letters Logo"
-              width={36}
-              height={36}
-              className="rounded-md transition-transform duration-300 group-hover:scale-110"
+              width={60}
+              height={60}
+              className=""
             />
           </div>
-          <span className="font-bold text-lg hidden sm:inline text-primary/90 group-hover:text-primary transition-colors">
+          <span className="font-semibold text-base sm:text-lg text-foreground/80 group-hover:text-foreground transition-colors">
             Lost Letters
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <NavigationMenu className="hidden md:flex">
-          <NavigationMenuList className="flex gap-2">
-            {navLinks.map((link) => (
-              <NavigationMenuItem key={link.href}>
-                <Link
-                  href={link.href}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 relative
-                    ${
-                      pathname === link.href
-                        ? "bg-primary/10 text-primary"
-                        : "text-foreground/70 hover:text-foreground hover:bg-accent"
-                    }`}
-                >
-                  {link.label}
-                  {pathname === link.href && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-0.5 bg-primary rounded-full"></span>
-                  )}
-                </Link>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
+        {/* Desktop Navigation (pill links) */}
+        <nav className="hidden md:flex items-center gap-2">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border-2
+                ${
+                  pathname === link.href
+                    ? "bg-main text-main-foreground border-border shadow-shadow"
+                    : "bg-secondary-background text-foreground/80 hover:text-foreground border-border hover:shadow-shadow"
+                }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
 
         {/* Mobile menu button */}
         <Button
           variant="reverse"
           size="icon"
-          className="md:hidden rounded-full hover:bg-primary/10"
+          className="md:hidden rounded-full hover:bg-main/10"
           onClick={(e) => {
             e.stopPropagation();
             setIsMenuOpen(!isMenuOpen);
@@ -107,7 +101,7 @@ export default function NavBar() {
           aria-expanded={isMenuOpen}
         >
           {isMenuOpen ? (
-            <X className="h-5 w-5 text-primary" />
+            <X className="h-5 w-5 text-main" />
           ) : (
             <Menu className="h-5 w-5" />
           )}
@@ -116,7 +110,7 @@ export default function NavBar() {
 
       {/* Mobile Navigation Menu */}
       <div
-        className={`md:hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-md transform transition-all duration-300 ease-in-out 
+        className={`md:hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-xl transform transition-all duration-300 ease-in-out 
           ${
             isMenuOpen
               ? "translate-x-0 opacity-100"
@@ -131,11 +125,11 @@ export default function NavBar() {
               key={link.href}
               href={link.href}
               onClick={handleNavClick}
-              className={`px-4 py-4 bg-background border-2 font-semibold rounded-lg text-lg transition-all duration-200
+              className={`px-4 py-4 bg-secondary-background border-2 font-semibold rounded-2xl text-lg transition-all duration-200
                 ${
                   pathname === link.href
-                    ? "bg-primary/10 text-primary shadow-sm"
-                    : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                    ? "bg-main/10 text-foreground shadow-sm"
+                    : "text-foreground/80 hover:text-foreground hover:bg-main/10"
                 }`}
             >
               <div className="flex items-center">

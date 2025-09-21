@@ -19,4 +19,8 @@ model Letter {
   message   String
   ip        String
   createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([name])
+  @@index([message])
 }

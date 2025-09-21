@@ -5,6 +5,7 @@ import Masonry from "react-masonry-css";
 import LetterCard from "./LetterCard";
 import { Button } from "@/components/ui/button";
 import { getPaginatedLetters } from "@/actions/letter";
+import { useRouter } from "next/navigation";
 
 type Letter = {
   id: string;
@@ -17,6 +18,7 @@ type Letter = {
 export default function RecentLetters({ limit = 8 }) {
   const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const breakpointColumnsObj = {
     default: 4,
@@ -65,10 +67,7 @@ export default function RecentLetters({ limit = 8 }) {
         <p className="text-muted-foreground max-w-md">
           Be the first to write a letter and share your thoughts with the world!
         </p>
-        <Button
-          onClick={() => (window.location.href = "/writeLetter")}
-          className="mt-6"
-        >
+        <Button onClick={() => router.push("/writeLetter")} className="mt-6">
           Write a Letter
         </Button>
       </div>

@@ -1,139 +1,334 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getPaginatedLetters, searchLetters } from "@/actions/letter";
+import { getPaginatedLetters } from "@/actions/letter";
 import LetterCard from "@/components/LetterCard";
 import { Search, X } from "lucide-react";
-
-// Define the Letter type based on the prisma schema
-type Letter = {
-  id: string;
-  name: string;
-  message: string;
-  ip: string;
-  createdAt: Date;
-};
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Letter } from "@/types/letter";
 
 const LostLettersPage = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const initialQuery = searchParams.get("q") ?? "";
+  const initialPageFromUrl = Number.parseInt(searchParams.get("page") ?? "1");
+  const initialPage =
+    Number.isFinite(initialPageFromUrl) && initialPageFromUrl > 0
+      ? initialPageFromUrl
+      : 1;
+
   const [letters, setLetters] = useState<Letter[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(initialQuery);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(initialQuery);
+  const [page, setPage] = useState(initialPage);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
   const pageSize = 10;
 
-  useEffect(() => {
-    loadLetters();
-  }, [page]);
+  const requestIdRef = useRef(0);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  const loadLetters = async () => {
-    setLoading(true);
+  // Persistent cache using sessionStorage
+  const getCacheKey = (searchTerm: string) =>
+    `lostLetters_${searchTerm || "default"}`;
 
+  const getCachedData = (searchTerm: string) => {
     try {
-      // Add a retry mechanism on the client side too
-      let attempts = 2;
-      let result;
+      const cached = sessionStorage.getItem(getCacheKey(searchTerm));
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  };
 
-      while (attempts > 0) {
-        result = await getPaginatedLetters(page, pageSize);
+  const setCachedData = (
+    searchTerm: string,
+    data: {
+      letters: Letter[];
+      page: number;
+      hasNextPage: boolean;
+    }
+  ) => {
+    try {
+      sessionStorage.setItem(getCacheKey(searchTerm), JSON.stringify(data));
+    } catch {
+      // Ignore storage errors
+    }
+  };
 
-        if (result.success) {
-          break; // Success, exit retry loop
-        } else {
+  const clearCache = (searchTerm: string) => {
+    try {
+      sessionStorage.removeItem(getCacheKey(searchTerm));
+    } catch {
+      // Ignore storage errors
+    }
+  };
+
+  // Debounce the search term
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim());
+    }, 350);
+    return () => clearTimeout(handle);
+  }, [searchTerm]);
+
+  // Helper to build and set URL params
+  const updateUrl = (nextPage: number, nextQuery: string, replace = false) => {
+    const params = new URLSearchParams();
+    if (nextQuery) params.set("q", nextQuery);
+    if (nextPage > 1) params.set("page", String(nextPage));
+    const url = params.toString()
+      ? `${pathname}?${params.toString()}`
+      : pathname;
+    if (replace) router.replace(url);
+    else router.push(url);
+  };
+
+  // Fetch a page of data
+  const fetchPage = useCallback(
+    async (
+      pageToFetch: number,
+      term: string,
+      { append }: { append: boolean }
+    ) => {
+      const currentRequestId = ++requestIdRef.current;
+      if (!append) {
+        setIsSearching(Boolean(term) && pageToFetch === 1);
+        setIsInitialLoading(true);
+      } else {
+        setIsFetchingMore(true);
+      }
+
+      try {
+        let attempts = 2;
+        let result: any = null;
+
+        while (attempts > 0) {
+          result = await getPaginatedLetters(
+            pageToFetch,
+            pageSize,
+            term || undefined
+          );
+          if (result?.success) break;
           attempts--;
-          if (attempts === 0) break; // Last attempt failed
+          if (attempts === 0) break;
+          await new Promise((r) => setTimeout(r, 800));
+        }
 
-          // Wait before retrying
-          await new Promise((r) => setTimeout(r, 1000));
+        // Ignore late responses
+        if (currentRequestId !== requestIdRef.current) return;
+
+        if (result?.success && result?.data) {
+          if (append) {
+            setLetters((prev) => {
+              const existingIds = new Set(prev.map((l) => l.id));
+              const newLetters = [
+                ...prev,
+                ...result.data.filter((l: Letter) => !existingIds.has(l.id)),
+              ];
+              // Update cache
+              setCachedData(term, {
+                letters: newLetters,
+                page: pageToFetch,
+                hasNextPage: Boolean(result.pagination?.hasNextPage),
+              });
+              return newLetters;
+            });
+          } else {
+            setLetters(result.data);
+            // Update cache
+            setCachedData(term, {
+              letters: result.data,
+              page: pageToFetch,
+              hasNextPage: Boolean(result.pagination?.hasNextPage),
+            });
+          }
+          setHasNextPage(Boolean(result.pagination?.hasNextPage));
+        } else {
+          if (!append) {
+            setLetters([]);
+            // Clear cache on error
+            clearCache(term);
+          }
+          setHasNextPage(false);
+          console.error("Failed to load letters:", result?.error);
+        }
+      } catch (error) {
+        if (!append) {
+          setLetters([]);
+          // Clear cache on error
+          clearCache(term);
+        }
+        setHasNextPage(false);
+        console.error("Error fetching letters:", error);
+      } finally {
+        if (!append) {
+          setIsInitialLoading(false);
+          setIsSearching(false);
+        } else {
+          setIsFetchingMore(false);
         }
       }
+    },
+    []
+  );
 
-      if (result?.success && result?.data) {
-        setLetters(result.data);
-        setTotalPages(result.pagination?.totalPages || 1);
-      } else {
-        console.error("Failed to load letters:", result?.error);
-        setLetters([]);
-        // Show an error message to the user
-        // The existing empty state UI will show
-      }
-    } catch (error) {
-      console.error("Error in loadLetters:", error);
-      setLetters([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Handle search term changes (debounced) and initial load
+  useEffect(() => {
+    // Check if we have cached data for this search term
+    const cached = getCachedData(debouncedSearchTerm);
 
-  const handleSearch = async () => {
-    setLoading(true);
-    if (searchTerm.trim() === "") {
-      await loadLetters();
+    if (cached && cached.letters.length > 0) {
+      // Restore from cache
+      setLetters(cached.letters);
+      setPage(cached.page);
+      setHasNextPage(cached.hasNextPage);
+      setIsInitialLoading(false);
     } else {
-      const result = await searchLetters(searchTerm);
-      if (result.success && result.data) {
-        setLetters(result.data);
-        // Reset pagination for search results
+      // Fetch new data
+      startTransition(() => {
+        // Reset to page 1 when search changes
         setPage(1);
-        setTotalPages(1);
-      } else {
-        setLetters([]);
-      }
+        updateUrl(1, debouncedSearchTerm, true);
+        fetchPage(1, debouncedSearchTerm, { append: false });
+      });
     }
-    setLoading(false);
-  };
+  }, [debouncedSearchTerm]);
+
+  // Load more when page increases (infinite scroll / manual load)
+  useEffect(() => {
+    if (page === 1) return; // initial handled by mount effect
+    startTransition(() => {
+      // Don't update URL for infinite scroll - keep it at page 1
+      fetchPage(page, debouncedSearchTerm, { append: true });
+    });
+  }, [page, debouncedSearchTerm]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+    if (!hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting && !isFetchingMore) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingMore]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      handleSearch();
+      // Immediate search commit on Enter
+      setDebouncedSearchTerm(searchTerm.trim());
     }
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-7xl">
+    <div className="container mt-20 mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-7xl">
       <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center sm:text-left">
         Lost Letters
       </h1>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-8 sm:mb-10">
         <div className="relative flex-grow">
+          <label htmlFor="search-input" className="sr-only">
+            Search letters by name or message
+          </label>
           <Input
-            placeholder="Search by receiver's name..."
+            id="search-input"
+            placeholder="Search by name or message..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyPress}
             className="pl-10 pr-4 py-2 h-11 transition-all"
+            aria-describedby="search-help"
           />
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+            aria-hidden="true"
+          />
           {searchTerm && (
             <button
               onClick={() => {
                 setSearchTerm("");
-                loadLetters();
+                // Clearing triggers debounced effect
               }}
               className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground hover:text-foreground rounded-full flex items-center justify-center"
               aria-label="Clear search"
+              type="button"
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4" aria-hidden="true" />
             </button>
           )}
         </div>
+        <div id="search-help" className="sr-only">
+          Search through letters by the recipient's name or message content
+        </div>
         <Button
-          onClick={handleSearch}
+          onClick={() =>
+            startTransition(() => setDebouncedSearchTerm(searchTerm.trim()))
+          }
           className="px-6 h-11 font-medium transition-all"
+          disabled={isPending}
+          type="button"
         >
-          Search
+          {isPending ? "Searching..." : "Search"}
         </Button>
+        {(isSearching ||
+          (isInitialLoading && letters.length === 0) ||
+          isPending) && (
+          <div
+            aria-live="polite"
+            className="flex items-center text-sm text-muted-foreground px-1"
+          >
+            {isPending ? "Loading..." : "Searching…"}
+          </div>
+        )}
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center py-24 text-muted-foreground">
-          <div className="flex flex-col items-center gap-4">
-            <div className="h-8 w-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin"></div>
-            <div>Loading letters...</div>
-          </div>
+      {isInitialLoading && letters.length === 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          {Array.from({ length: 9 }).map((_, idx) => (
+            <div key={idx} className="animate-pulse">
+              <div className="bg-white/70 backdrop-blur-sm border rounded-lg p-4">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="h-10 w-10 rounded-full bg-gray-200" />
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 bg-gray-200 rounded" />
+                  <div className="h-3 bg-gray-200 rounded w-5/6" />
+                  <div className="h-3 bg-gray-200 rounded w-4/6" />
+                </div>
+                <div className="mt-4 h-px bg-gray-100" />
+                <div className="mt-3 h-3 bg-gray-200 rounded w-1/4 ml-auto" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : letters.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -149,7 +344,7 @@ const LostLettersPage = () => {
               variant="reverse"
               onClick={() => {
                 setSearchTerm("");
-                loadLetters();
+                // Clearing triggers debounced effect
               }}
               className="mt-6"
             >
@@ -165,27 +360,17 @@ const LostLettersPage = () => {
         </div>
       )}
 
-      {/* Pagination controls */}
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2 sm:gap-3 mt-10 sm:mt-12">
+      {/* Infinite scroll sentinel and fallback */}
+      <div ref={loadMoreRef} className="h-1" />
+      {hasNextPage && (
+        <div className="flex justify-center mt-10 sm:mt-12">
           <Button
             variant="neutral"
-            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            disabled={page === 1}
-            className="px-4 sm:px-5 h-10"
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={isFetchingMore}
+            className="px-6 h-10"
           >
-            Previous
-          </Button>
-          <div className="py-2 px-4 bg-gray-100 rounded-md flex items-center text-sm font-medium">
-            Page {page} of {totalPages}
-          </div>
-          <Button
-            variant="neutral"
-            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={page === totalPages}
-            className="px-4 sm:px-5 h-10"
-          >
-            Next
+            {isFetchingMore ? "Loading…" : "Load more"}
           </Button>
         </div>
       )}

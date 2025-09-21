@@ -11,13 +11,47 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { Metadata } from "next";
 
 interface Params {
   id: string;
 }
 
-export default async function LetterDetailPage({ params }: any) {
-  const { id } = params;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const result = await getLetterById(id);
+
+  if (!result.success || !result.data) {
+    return {
+      title: "Letter Not Found - Lost Letters",
+      description: "The requested letter could not be found.",
+    };
+  }
+
+  const letter = result.data;
+  const recipient = letter.name;
+
+  return {
+    title: `Letter to ${recipient} - Lost Letters`,
+    description: `Read an anonymous letter addressed to ${recipient}. Discover heartfelt messages and connect with the community.`,
+    openGraph: {
+      title: `Letter to ${recipient} - Lost Letters`,
+      description: `Read an anonymous letter addressed to ${recipient}.`,
+      type: "article",
+    },
+  };
+}
+
+export default async function LetterDetailPage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { id } = await params;
   const result = await getLetterById(id);
   if (!result.success || !result.data) {
     notFound();

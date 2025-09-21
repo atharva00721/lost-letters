@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { moderateContent } from "@/lib/gemini";
+import { Letter } from "@/types/letter";
 
 // Type definition for letter data
 interface LetterData {
@@ -22,34 +23,40 @@ export async function createLetter(data: LetterData) {
 
   try {
     // First, moderate the content using Gemini AI
-    console.log(`[createLetter] Moderating content for letter from: ${data.name}`);
-    
+    console.log(
+      `[createLetter] Moderating content for letter from: ${data.name}`
+    );
+
     // Check name for inappropriate content
     const nameModeration = await moderateContent(data.name);
     if (!nameModeration.isValid) {
-      console.log(`[createLetter] Name rejected by content moderation: ${nameModeration.message}`);
-      return { 
-        success: false, 
+      console.log(
+        `[createLetter] Name rejected by content moderation: ${nameModeration.message}`
+      );
+      return {
+        success: false,
         error: "Your name contains inappropriate content",
-        moderationDetails: nameModeration 
+        moderationDetails: nameModeration,
       };
     }
-    
+
     // Check message for inappropriate content
     const messageModeration = await moderateContent(data.message);
     if (!messageModeration.isValid) {
-      console.log(`[createLetter] Message rejected by content moderation: ${messageModeration.message}`);
-      return { 
-        success: false, 
-        error: "Your message contains inappropriate content", 
-        moderationDetails: messageModeration 
+      console.log(
+        `[createLetter] Message rejected by content moderation: ${messageModeration.message}`
+      );
+      return {
+        success: false,
+        error: "Your message contains inappropriate content",
+        moderationDetails: messageModeration,
       };
     }
-    
+
     // Use filtered versions of name and message if they were modified
     const filteredName = nameModeration.filteredText;
     const filteredMessage = messageModeration.filteredText;
-    
+
     // Create new letter in database with filtered content
     console.log(
       `[createLetter] Creating new letter from: ${filteredName} (IP: ${data.ip})`
@@ -67,21 +74,21 @@ export async function createLetter(data: LetterData) {
       `[createLetter] Letter created successfully with ID: ${letter.id}`
     );
 
-    // Revalidate the path to update the UI
+    // Revalidate the paths to update the UI
     revalidatePath("/");
+    revalidatePath("/lostLetters");
 
     // If content was filtered but still acceptable, include a warning
-    const wasContentFiltered = 
-      filteredName !== data.name || 
-      filteredMessage !== data.message;
-    
-    return { 
-      success: true, 
+    const wasContentFiltered =
+      filteredName !== data.name || filteredMessage !== data.message;
+
+    return {
+      success: true,
       data: letter,
       wasContentFiltered,
-      message: wasContentFiltered ? 
-        "Your message was filtered to remove potentially inappropriate content" : 
-        undefined
+      message: wasContentFiltered
+        ? "Your message was filtered to remove potentially inappropriate content"
+        : undefined,
     };
   } catch (error) {
     console.error("[createLetter] Failed to create letter:", error);
@@ -99,14 +106,6 @@ export async function getLetters() {
   try {
     // Add a retry mechanism for production database connections
     let retries = 3;
-    interface Letter {
-      id: string;
-      name: string;
-      message: string;
-      ip: string;
-      createdAt: Date;
-    }
-
     let letters: Letter[] = []; // Initialize with empty array
 
     while (retries > 0) {
@@ -175,6 +174,7 @@ export async function updateLetter(id: string, data: Partial<LetterData>) {
 
     console.log(`[updateLetter] Successfully updated letter: ${id}`);
     revalidatePath("/");
+    revalidatePath("/lostLetters");
 
     return { success: true, data: letter };
   } catch (error) {
@@ -198,6 +198,7 @@ export async function deleteLetter(id: string) {
 
     console.log(`[deleteLetter] Successfully deleted letter: ${id}`);
     revalidatePath("/");
+    revalidatePath("/lostLetters");
 
     return { success: true };
   } catch (error) {
@@ -269,14 +270,6 @@ export async function getPaginatedLetters(
     // Add retry mechanism for production
     let retries = 3;
     let totalCount = 0;
-    interface Letter {
-      id: string;
-      name: string;
-      message: string;
-      ip: string;
-      createdAt: Date;
-    }
-
     let letters: Letter[] = []; // Initialize letters array
 
     while (retries > 0) {

@@ -13,15 +13,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { animate, spring } from "motion";
 
-// Define the Letter type based on the prisma schema
-type Letter = {
-  id: string;
-  name: string;
-  message: string;
-  ip: string;
-  createdAt: Date;
-  likes?: number;
-};
+import { Letter } from "@/types/letter";
 
 export interface LetterCardProps {
   letter: Letter;
@@ -104,16 +96,7 @@ export default function LetterCard({ letter }: LetterCardProps) {
             </div>
             <div className="flex justify-between items-center mt-2">
               {isLong && (
-                <Button
-                  variant="neutral"
-                  size="sm"
-                  className="text-xs"
-                  onClick={(e) => {
-                    // Let the link handle navigation
-                  }}
-                >
-                  Read more
-                </Button>
+                <div className="text-xs text-muted-foreground">Read more →</div>
               )}
               {(letter.likes || 0) > 0 && (
                 <div className="ml-auto text-xs text-gray-500">

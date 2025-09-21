@@ -73,7 +73,7 @@ export default function RootLayout({
       >
         <NavigationMenuDemo />
         {/* Added top padding to account for fixed navbar */}
-        <main className="pt-[100px] pb-12 min-h-[calc(100vh-60px)]">
+        <main className="min-h-[calc(100vh-60px)]">
           {children}
         </main>
       </body>
