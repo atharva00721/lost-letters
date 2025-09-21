@@ -16,7 +16,7 @@ export default async function WriteLetterPage() {
     "127.0.0.1"; // Fallback to localhost if no IP can be determined
 
   return (
-    <div className="max-w-xl mx-auto px-8 py-10">
+    <div className="container mt-20 mx-auto px-4 sm:px-6 py-6 sm:py-10 max-w-4xl">
       <UserDetailsForm userIp={userIp} />
     </div>
   );

@@ -29,6 +29,7 @@ const LostLettersContent = () => {
     handleSearch,
     handleClearSearch,
     handleLoadMore,
+    handleRefresh,
   } = useLettersData();
 
   return (
@@ -42,6 +43,7 @@ const LostLettersContent = () => {
         onSearchTermChange={setSearchTerm}
         onSearch={handleSearch}
         onClearSearch={handleClearSearch}
+        onRefresh={handleRefresh}
         isPending={isPending}
         isSearching={isSearching}
         isInitialLoading={isInitialLoading}
@@ -74,16 +76,18 @@ const LostLettersContent = () => {
 
 const LostLettersPage = () => {
   return (
-    <Suspense fallback={
-      <div className="container mt-20 mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-7xl">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center sm:text-left">
-          Lost Letters
-        </h1>
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+    <Suspense
+      fallback={
+        <div className="container mt-20 mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-7xl">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center sm:text-left">
+            Lost Letters
+          </h1>
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <LostLettersContent />
     </Suspense>
   );

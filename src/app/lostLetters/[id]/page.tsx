@@ -2,15 +2,9 @@ import { getLetterById } from "@/actions/letter";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
+
 import { Metadata } from "next";
 
 interface Params {
@@ -64,7 +58,7 @@ export default async function LetterDetailPage({
   });
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-10 max-w-3xl">
+    <div className="container mt-20 mx-auto px-4 sm:px-6 py-6 sm:py-10 max-w-3xl">
       <Button size="sm" className="mb-6 group" asChild>
         <Link
           href="/lostLetters"
@@ -75,46 +69,41 @@ export default async function LetterDetailPage({
         </Link>
       </Button>
 
-      <Card className="bg-white/70 backdrop-blur-sm border-opacity-50 shadow-sm hover:shadow transition-shadow">
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-4">
-            <Image
-              src="/icons/icon1.jpg"
-              alt="avatar"
-              width={48}
-              height={48}
-              className="rounded-full border bg-white shadow-sm"
-            />
-            <div className="flex-1">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <CardTitle className="text-2xl font-bold">
-                  To: {letter.name}
-                </CardTitle>
-                <div className="flex items-center gap-3">
-                  <p className="text-sm text-muted-foreground">
-                    {formattedDate}
-                  </p>
-                </div>
-              </div>
-            </div>
+      <Card className="bg-white/70 backdrop-blur-sm border-opacity-50 shadow-sm hover:shadow transition-shadow relative overflow-hidden">
+        {/* Letter paper texture overlay */}
+        <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-gray-200 via-transparent to-gray-300 pointer-events-none" />
+
+        <CardHeader className="pt-8 px-8 relative">
+          {/* Letter greeting */}
+          <div className="pb-1">
+            <CardTitle className="text-2xl font-serif text-foreground">
+              {letter.name},
+            </CardTitle>
+          </div>
+          {/* Date in top-right corner like a traditional letter */}
+          <div className="text-left text-sm text-muted-foreground">
+            {formattedDate}
           </div>
         </CardHeader>
 
-        <CardContent className="pt-0 pb-6">
-          <div className="border-t border-border/40 mb-4 mt-1" />
-          <pre className="whitespace-pre-wrap leading-relaxed font-sans text-base sm:text-lg">
-            {letter.message}
-          </pre>
-        </CardContent>
+        <CardContent className="px-8 pb-8 relative">
+          {/* Letter content with proper spacing */}
+          <div className="space-y-6">
+            <div className="text-base sm:text-lg leading-relaxed font-serif text-foreground whitespace-pre-wrap">
+              {letter.message}
+            </div>
 
-        <CardFooter className="justify-end border-t border-border/40 pt-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <span>Letter ID:</span>
-            <code className="bg-muted px-1.5 py-0.5 rounded text-muted-foreground font-mono text-xs">
-              {letter.id.substring(0, 8)}
-            </code>
+            {/* Letter signature area */}
+            <div className="pt-6">
+              <div className="text-right">
+                <div className="text-sm text-muted-foreground italic mb-2">
+                  Sincerely,
+                </div>
+                <div className="text-sm text-muted-foreground">Anonymous</div>
+              </div>
+            </div>
           </div>
-        </CardFooter>
+        </CardContent>
       </Card>
     </div>
   );

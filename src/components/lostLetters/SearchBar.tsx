@@ -2,13 +2,14 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Loader2 } from "lucide-react";
+import { Search, X, Loader2, RefreshCw } from "lucide-react";
 
 interface SearchBarProps {
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
   onSearch: () => void;
   onClearSearch: () => void;
+  onRefresh: () => void;
   isPending: boolean;
   isSearching: boolean;
   isInitialLoading: boolean;
@@ -20,6 +21,7 @@ export function SearchBar({
   onSearchTermChange,
   onSearch,
   onClearSearch,
+  onRefresh,
   isPending,
   isSearching,
   isInitialLoading,
@@ -64,21 +66,34 @@ export function SearchBar({
       <div id="search-help" className="sr-only">
         Search through letters by the recipient&apos;s name or message content
       </div>
-      <Button
-        onClick={onSearch}
-        className="px-6 h-11 font-medium transition-all"
-        disabled={isPending}
-        type="button"
-      >
-        {isPending && isSearching ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Searching...
-          </>
-        ) : (
-          "Search"
-        )}
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          onClick={onSearch}
+          className="px-6 h-11 font-medium transition-all"
+          disabled={isPending}
+          type="button"
+        >
+          {isPending && isSearching ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Searching...
+            </>
+          ) : (
+            "Search"
+          )}
+        </Button>
+        <Button
+          onClick={onRefresh}
+          variant="outline"
+          className="px-4 h-11 font-medium transition-all"
+          disabled={isPending}
+          type="button"
+          title="Find new letters (clears cache and refreshes)"
+        >
+          <RefreshCw className="h-4 w-4" />
+          <span className="sr-only sm:not-sr-only sm:ml-2">Find New</span>
+        </Button>
+      </div>
     </div>
   );
 }

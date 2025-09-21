@@ -31,42 +31,70 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
 
   const requestIdRef = useRef(0);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const cacheClearIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Persistent cache using sessionStorage
-  const getCacheKey = useCallback((searchTerm: string) =>
-    `lostLetters_${searchTerm || "default"}`, []);
+  const getCacheKey = useCallback(
+    (searchTerm: string) => `lostLetters_${searchTerm || "default"}`,
+    []
+  );
 
-  const getCachedData = useCallback((searchTerm: string) => {
-    try {
-      const cached = sessionStorage.getItem(getCacheKey(searchTerm));
-      return cached ? JSON.parse(cached) : null;
-    } catch {
-      return null;
-    }
-  }, [getCacheKey]);
+  const getCachedData = useCallback(
+    (searchTerm: string) => {
+      try {
+        const cached = sessionStorage.getItem(getCacheKey(searchTerm));
+        return cached ? JSON.parse(cached) : null;
+      } catch {
+        return null;
+      }
+    },
+    [getCacheKey]
+  );
 
-  const setCachedData = useCallback((
-    searchTerm: string,
-    data: {
-      letters: Letter[];
-      page: number;
-      hasNextPage: boolean;
-    }
-  ) => {
+  const setCachedData = useCallback(
+    (
+      searchTerm: string,
+      data: {
+        letters: Letter[];
+        page: number;
+        hasNextPage: boolean;
+      }
+    ) => {
+      try {
+        sessionStorage.setItem(getCacheKey(searchTerm), JSON.stringify(data));
+      } catch {
+        // Ignore storage errors
+      }
+    },
+    [getCacheKey]
+  );
+
+  const clearCache = useCallback(
+    (searchTerm: string) => {
+      try {
+        sessionStorage.removeItem(getCacheKey(searchTerm));
+      } catch {
+        // Ignore storage errors
+      }
+    },
+    [getCacheKey]
+  );
+
+  const clearAllCache = useCallback(() => {
     try {
-      sessionStorage.setItem(getCacheKey(searchTerm), JSON.stringify(data));
+      // Clear all lostLetters cache entries
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key && key.startsWith("lostLetters_")) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((key) => sessionStorage.removeItem(key));
     } catch {
       // Ignore storage errors
     }
-  }, [getCacheKey]);
-
-  const clearCache = useCallback((searchTerm: string) => {
-    try {
-      sessionStorage.removeItem(getCacheKey(searchTerm));
-    } catch {
-      // Ignore storage errors
-    }
-  }, [getCacheKey]);
+  }, []);
 
   // Debounce the search term
   useEffect(() => {
@@ -77,16 +105,19 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
   }, [searchTerm]);
 
   // Helper to build and set URL params
-  const updateUrl = useCallback((nextPage: number, nextQuery: string, replace = false) => {
-    const params = new URLSearchParams();
-    if (nextQuery) params.set("q", nextQuery);
-    if (nextPage > 1) params.set("page", String(nextPage));
-    const url = params.toString()
-      ? `${pathname}?${params.toString()}`
-      : pathname;
-    if (replace) router.replace(url);
-    else router.push(url);
-  }, [pathname, router]);
+  const updateUrl = useCallback(
+    (nextPage: number, nextQuery: string, replace = false) => {
+      const params = new URLSearchParams();
+      if (nextQuery) params.set("q", nextQuery);
+      if (nextPage > 1) params.set("page", String(nextPage));
+      const url = params.toString()
+        ? `${pathname}?${params.toString()}`
+        : pathname;
+      if (replace) router.replace(url);
+      else router.push(url);
+    },
+    [pathname, router]
+  );
 
   // Fetch a page of data
   const fetchPage = useCallback(
@@ -227,6 +258,31 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingMore]);
 
+  // Auto-clear cache every 10 minutes
+  useEffect(() => {
+    const clearCacheInterval = () => {
+      clearAllCache();
+      // Force refresh current data
+      startTransition(() => {
+        setPage(1);
+        updateUrl(1, debouncedSearchTerm, true);
+        fetchPage(1, debouncedSearchTerm, { append: false });
+      });
+    };
+
+    // Set up interval to clear cache every 10 minutes (600,000 ms)
+    cacheClearIntervalRef.current = setInterval(
+      clearCacheInterval,
+      10 * 60 * 1000
+    );
+
+    return () => {
+      if (cacheClearIntervalRef.current) {
+        clearInterval(cacheClearIntervalRef.current);
+      }
+    };
+  }, [clearAllCache, debouncedSearchTerm, fetchPage, updateUrl]);
+
   const handleSearch = () => {
     const trimmedTerm = searchTerm.trim();
     // Always perform search when button is clicked (force fresh search)
@@ -245,6 +301,16 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
 
   const handleLoadMore = () => {
     setPage((prev) => prev + 1);
+  };
+
+  const handleRefresh = () => {
+    // Clear all cache and force refresh
+    clearAllCache();
+    startTransition(() => {
+      setPage(1);
+      updateUrl(1, debouncedSearchTerm, true);
+      fetchPage(1, debouncedSearchTerm, { append: false });
+    });
   };
 
   return {
@@ -266,5 +332,6 @@ export function useLettersData({ pageSize = 10 }: UseLettersDataOptions = {}) {
     handleSearch,
     handleClearSearch,
     handleLoadMore,
+    handleRefresh,
   };
 }

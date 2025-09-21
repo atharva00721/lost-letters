@@ -106,16 +106,28 @@ export default function UserDetailsForm({
   }
 
   return (
-    <Card className="max-w-md mx-auto mt-10 bg-white">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-main">
-          Send a Letter
-        </CardTitle>
-        <CardDescription>
-          Share your thoughts with someone special.
-        </CardDescription>
+    <Card className="max-w-2xl mx-auto mt-10 bg-white/70 backdrop-blur-sm border-opacity-50 shadow-sm hover:shadow transition-shadow relative overflow-hidden">
+      {/* Letter paper texture overlay */}
+      <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-gray-200 via-transparent to-gray-300 pointer-events-none" />
+
+      <CardHeader className="px-8 relative">
+        {/* Letter greeting */}
+        <div className="pb-1">
+          <CardTitle className="text-2xl font-serif text-foreground">
+            Write a Letter
+          </CardTitle>
+          {/* Date in top-right corner like a traditional letter */}
+          <div className="text-left text-sm text-muted-foreground">
+            {new Date().toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
+
+      <CardContent className="px-8 relative">
         <div>
           <Form {...form}>
             <form
@@ -127,12 +139,14 @@ export default function UserDetailsForm({
                 name="receiver"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">To</FormLabel>
+                    <FormLabel className="text-sm font-medium font-serif">
+                      Dear
+                    </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter receiver's name"
+                        placeholder="Enter recipient's name"
                         {...field}
-                        className="h-11"
+                        className="h-11 font-serif bg-transparent border-0 border-b border-border/40 rounded-none focus:border-foreground/60 focus:ring-0"
                       />
                     </FormControl>
                     <FormMessage />
@@ -144,21 +158,18 @@ export default function UserDetailsForm({
                 name="content"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">
-                      Your Message
-                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Textarea
                           placeholder="Write your letter here..."
-                          rows={8}
+                          rows={12}
                           maxLength={500}
                           {...field}
                           onChange={(e) => {
                             field.onChange(e);
                             setContentLength(e.target.value.length);
                           }}
-                          className="pr-16 resize-none min-h-[180px] bg-white/80"
+                          className="pr-16 resize-none min-h-[300px] bg-transparent border-0 font-serif text-base leading-relaxed focus:ring-0 focus:border-0"
                         />
                         <span className="absolute bottom-2 right-3 text-xs text-muted-foreground bg-white/60 px-1.5 py-0.5 rounded">
                           {contentLength}/500
@@ -182,21 +193,31 @@ export default function UserDetailsForm({
                 </div>
               )}
 
+              {/* Letter signature area */}
+              <div className="pt-6">
+                <div className="text-right">
+                  <div className="text-sm text-muted-foreground italic mb-2">
+                    Sincerely,
+                  </div>
+                  <div className="text-sm text-muted-foreground">Anonymous</div>
+                </div>
+              </div>
+
               <Button
                 type="submit"
-                className="w-full text-lg py-6 font-semibold transition-all shadow-sm hover:shadow-md"
+                className="w-full text-lg font-semibold transition-all shadow-sm hover:shadow-md"
                 disabled={submitted || isSubmitting}
               >
                 {isSubmitting
-                  ? "Sharing..."
+                  ? "Sending..."
                   : submitted
-                  ? "Shared!"
-                  : "Share Letter"}
+                  ? "Sent!"
+                  : "Send Letter"}
               </Button>
 
               {submitted && (
                 <div className="text-green-600 text-center font-medium bg-green-50 p-3 rounded-md border border-green-200 mt-3">
-                  Your letter has been shared!
+                  Your letter has been sent!
                 </div>
               )}
             </form>
