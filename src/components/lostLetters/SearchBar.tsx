@@ -84,7 +84,7 @@ export function SearchBar({
         </Button>
         <Button
           onClick={onRefresh}
-          variant="outline"
+          variant="neutral"
           className="px-4 h-11 font-medium transition-all"
           disabled={isPending}
           type="button"
