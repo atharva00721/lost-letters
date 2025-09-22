@@ -37,6 +37,20 @@ export async function generateMetadata({
       title: `Letter to ${recipient} - Lost Letters`,
       description: `Read an anonymous letter addressed to ${recipient}.`,
       type: "article",
+      images: [
+        {
+          url: `/api/og/${id}`,
+          width: 1200,
+          height: 630,
+          alt: `Letter to ${recipient}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Letter to ${recipient} - Lost Letters`,
+      description: `Read an anonymous letter addressed to ${recipient}.`,
+      images: [`/api/og/${id}`],
     },
   };
 }
