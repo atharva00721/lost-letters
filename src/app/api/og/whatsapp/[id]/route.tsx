@@ -82,7 +82,7 @@ export async function GET(
         ),
         {
           width: 1200,
-          height: 630,
+          height: 300,
         }
       );
 
@@ -117,80 +117,40 @@ export async function GET(
     const response = new ImageResponse(
       (
         <div
-          tw="w-full h-full flex items-center justify-center p-6"
+          tw="w-full h-full flex items-center justify-center p-4"
           style={{ backgroundColor: "#d0fbea" }}
         >
           {/* Letter Card Container - WhatsApp optimized */}
           <div
-            tw="bg-white/90 backdrop-blur-sm border-2 border-black rounded-2xl relative overflow-hidden max-w-4xl mx-auto w-full h-full flex flex-col"
+            tw="bg-white/90 backdrop-blur-sm border-2 border-black rounded-2xl relative overflow-hidden max-w-5xl mx-auto w-full h-full flex flex-col"
             style={{ boxShadow: "3px 3px 0px 0px #000000" }}
           >
             {/* Letter paper texture overlay */}
             <div tw="absolute inset-0 opacity-8 bg-gradient-to-br from-gray-100 via-transparent to-gray-200 pointer-events-none" />
 
-            {/* Card Header */}
-            <div tw="pt-8 px-8 relative z-10 flex flex-col">
-              {/* Letter greeting */}
-              <div tw="pb-1 flex">
-                <div
-                  tw="text-3xl font-normal text-foreground leading-tight italic"
-                  style={{ fontFamily: "var(--font-instrument-serif), serif" }}
-                >
-                  {formattedTitle}
-                </div>
-              </div>
-              {/* Date */}
+            {/* Header - Greeting and Date */}
+            <div tw="px-6 pt-4 pb-1 relative z-10 flex flex-col">
               <div
-                tw="text-left text-base text-foreground mt-1 flex"
+                tw="text-4xl font-normal text-foreground leading-tight italic mb-1 flex"
+                style={{ fontFamily: "var(--font-instrument-serif), serif" }}
+              >
+                {formattedTitle}
+              </div>
+              <div
+                tw="text-sm text-foreground flex"
                 style={{ fontFamily: "var(--font-instrument-serif), serif" }}
               >
                 {formattedDate}
               </div>
             </div>
 
-            {/* Card Content */}
-            <div tw="px-8 pb-8 flex-1 flex flex-col relative z-10">
-              {/* Letter content */}
-              <div tw="flex-1 flex flex-col justify-start">
-                <div
-                  tw="text-2xl text-foreground whitespace-pre-wrap leading-relaxed flex mt-3"
-                  style={{ fontFamily: "var(--font-instrument-serif), serif" }}
-                >
-                  {message}
-                </div>
-              </div>
-
-              {/* Letter signature area - right aligned */}
-              <div tw="pt-6 flex justify-between items-end">
-                {/* Lost Letters branding - left side */}
-                <div
-                  tw="text-base text-gray-500 flex"
-                  style={{
-                    fontFamily: "var(--font-instrument-sans), sans-serif",
-                  }}
-                >
-                  Lost Letters
-                </div>
-
-                {/* Signature - right side */}
-                <div tw="text-right -space-y-1 flex flex-col">
-                  <div
-                    tw="text-lg text-foreground italic flex"
-                    style={{
-                      fontFamily: "var(--font-instrument-serif), serif",
-                    }}
-                  >
-                    Sincerely,
-                  </div>
-                  <div
-                    tw="text-base font-normal text-foreground flex"
-                    style={{
-                      fontFamily: "var(--font-instrument-sans), sans-serif",
-                    }}
-                  >
-                    Anonymous
-                  </div>
-                </div>
+            {/* Message */}
+            <div tw="flex-1 px-6 py-1 relative z-10 flex flex-col justify-start">
+              <div
+                tw="text-4xl text-foreground whitespace-pre-wrap leading-relaxed flex text-center mt-2"
+                style={{ fontFamily: "var(--font-instrument-serif), serif" }}
+              >
+                {message}
               </div>
             </div>
           </div>
@@ -198,7 +158,7 @@ export async function GET(
       ),
       {
         width: 1200,
-        height: 630,
+        height: 300,
         fonts: [
           {
             name: "Instrument Serif",
@@ -236,7 +196,7 @@ export async function GET(
       ),
       {
         width: 1200,
-        height: 630,
+        height: 300,
       }
     );
 
