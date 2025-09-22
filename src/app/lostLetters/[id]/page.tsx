@@ -51,6 +51,8 @@ export async function generateMetadata({
       title: `Letter to ${recipient} - Lost Letters`,
       description: `Read an anonymous letter addressed to ${recipient}.`,
       images: [`/api/og/${id}`],
+      creator: "@codepaglu",
+      site: "@codepaglu",
     },
   };
 }

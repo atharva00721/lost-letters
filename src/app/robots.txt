@@ -4,4 +4,4 @@ Allow: /
 # Allow social media crawlers to access OG images
 Allow: /api/og/*
 
-Sitemap: https://your-domain.com/sitemap.xml
+

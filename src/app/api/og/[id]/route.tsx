@@ -35,29 +35,16 @@ export async function GET(
 
     if (!result.success || !result.data) {
       // Simple fallback for missing letters
-      return new ImageResponse(
+      const response = new ImageResponse(
         (
           <div
-            style={{
-              background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "Instrument Sans, sans-serif",
-              position: "relative",
-            }}
+            tw="w-full h-full flex items-center justify-center relative"
+            style={{ backgroundColor: "#f6fefb" }}
           >
             {/* Letter paper texture overlay */}
             <div
+              tw="absolute inset-0 opacity-10"
               style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: "rgba(255, 255, 255, 0.1)",
                 backgroundImage:
                   "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.1) 1px, transparent 0)",
                 backgroundSize: "20px 20px",
@@ -65,46 +52,27 @@ export async function GET(
             />
 
             {/* Content */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                textAlign: "center",
-                padding: "60px",
-                maxWidth: "900px",
-                position: "relative",
-                zIndex: 1,
-              }}
-            >
+            <div tw="flex flex-col items-center justify-center text-center px-16 max-w-4xl relative z-10">
               <div
+                tw="text-6xl font-bold text-foreground mb-5 drop-shadow-sm flex"
                 style={{
-                  fontSize: 72,
-                  fontWeight: 700,
-                  color: "#2d3748",
-                  marginBottom: "20px",
-                  textShadow: "2px 2px 4px rgba(0,0,0,0.1)",
-                  display: "flex",
+                  fontFamily: "var(--font-instrument-sans), sans-serif",
                 }}
               >
                 Lost Letters
               </div>
               <div
+                tw="text-3xl text-foreground mb-10 flex"
                 style={{
-                  fontSize: 36,
-                  color: "#4a5568",
-                  marginBottom: "40px",
-                  display: "flex",
+                  fontFamily: "var(--font-instrument-sans), sans-serif",
                 }}
               >
                 Letter Not Found
               </div>
               <div
+                tw="text-xl text-foreground flex"
                 style={{
-                  fontSize: 24,
-                  color: "#718096",
-                  display: "flex",
+                  fontFamily: "var(--font-instrument-sans), sans-serif",
                 }}
               >
                 This letter may have been lost in the digital void
@@ -117,6 +85,14 @@ export async function GET(
           height: 630,
         }
       );
+
+      // Add cache headers
+      response.headers.set(
+        "Cache-Control",
+        "public, max-age=31536000, immutable"
+      );
+      response.headers.set("Content-Type", "image/png");
+      return response;
     }
 
     const letter = result.data;
@@ -138,165 +114,78 @@ export async function GET(
     // Prepare text for font loading
     const allText = `${formattedTitle} ${message} ${formattedDate} Sincerely, Anonymous Lost Letters`;
 
-    return new ImageResponse(
+    const response = new ImageResponse(
       (
         <div
-          style={{
-            background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "Instrument Sans, sans-serif",
-            position: "relative",
-            padding: "40px",
-          }}
+          tw="w-full h-full flex items-center justify-center p-8"
+          style={{ backgroundColor: "#d0fbea" }}
         >
-          {/* Letter Card Container */}
+          {/* Letter Card Container - covers almost all area */}
           <div
-            style={{
-              background: "rgba(255, 255, 255, 0.95)",
-              backdropFilter: "blur(20px)",
-              border: "3px solid rgba(0, 0, 0, 0.08)",
-              borderRadius: "16px",
-              width: "100%",
-              maxWidth: "2000px",
-              height: "1100px",
-              display: "flex",
-              flexDirection: "column",
-              position: "relative",
-              overflow: "hidden",
-              boxShadow:
-                "0 40px 80px rgba(0, 0, 0, 0.15), 0 20px 40px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)",
-            }}
+            tw="bg-white/80 backdrop-blur-sm border-2 border-black rounded-base relative overflow-hidden rounded-2xl max-w-4xl mx-auto w-full h-full py-4 flex flex-col"
+            style={{ boxShadow: "2px 2px 0px 0px #000000" }}
           >
             {/* Letter paper texture overlay */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: "rgba(255, 255, 255, 0.1)",
-                backgroundImage:
-                  "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0)",
-                backgroundSize: "20px 20px",
-                pointerEvents: "none",
-                display: "flex",
-              }}
-            />
+            <div tw="absolute inset-0 opacity-8 bg-gradient-to-br from-gray-100 via-transparent to-gray-200 pointer-events-none" />
 
             {/* Card Header */}
-            <div
-              style={{
-                padding: "80px 100px 40px 100px",
-                borderBottom: "2px solid rgba(0, 0, 0, 0.08)",
-                position: "relative",
-                zIndex: 1,
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+            <div tw="pt-12 px-12 relative z-10 flex flex-col">
               {/* Letter greeting */}
-              <div
-                style={{
-                  fontSize: 72,
-                  fontWeight: 400,
-                  color: "#1f2937",
-                  marginBottom: "24px",
-                  fontStyle: "italic",
-                  fontFamily: '"Instrument Serif", serif',
-                  letterSpacing: "-0.02em",
-                  display: "flex",
-                  textShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                {formattedTitle}
+              <div tw="pb-1 flex">
+                <div
+                  tw="text-4xl font-normal text-foreground leading-tight italic"
+                  style={{ fontFamily: "var(--font-instrument-serif), serif" }}
+                >
+                  {formattedTitle}
+                </div>
               </div>
               {/* Date */}
               <div
-                style={{
-                  fontSize: 36,
-                  color: "#6b7280",
-                  fontFamily: '"Instrument Serif", serif',
-                  fontWeight: 400,
-                  letterSpacing: "0.01em",
-                  display: "flex",
-                }}
+                tw="text-left text-lg text-foreground mt-2 flex"
+                style={{ fontFamily: "var(--font-instrument-serif), serif" }}
               >
                 {formattedDate}
               </div>
             </div>
 
             {/* Card Content */}
-            <div
-              style={{
-                padding: "60px 100px",
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-                zIndex: 1,
-              }}
-            >
+            <div tw="px-12 pb-12 flex-1 flex flex-col relative z-10">
               {/* Letter content */}
-              <div
-                style={{
-                  fontSize: 64,
-                  color: "#374151",
-                  lineHeight: 1.7,
-                  flex: 1,
-                  display: "flex",
-                  alignItems: "flex-start",
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                  fontFamily: '"Instrument Serif", serif',
-                  fontWeight: 400,
-                  letterSpacing: "0.01em",
-                }}
-              >
-                {message}
+              <div tw="flex-1 flex flex-col justify-start">
+                <div
+                  tw="text-3xl text-foreground whitespace-pre-wrap leading-relaxed flex mt-4"
+                  style={{ fontFamily: "var(--font-instrument-serif), serif" }}
+                >
+                  {message}
+                </div>
               </div>
 
-              {/* Letter signature area */}
-              <div
-                style={{
-                  marginTop: "60px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                }}
-              >
+              {/* Letter signature area - right aligned */}
+              <div tw="pt-8 flex justify-between items-end">
+                {/* Lost Letters branding - left side */}
                 <div
+                  tw="text-lg text-gray-500 flex"
                   style={{
-                    textAlign: "right",
-                    display: "flex",
-                    flexDirection: "column",
+                    fontFamily: "var(--font-instrument-sans), sans-serif",
                   }}
                 >
+                  Lost Letters
+                </div>
+
+                {/* Signature - right side */}
+                <div tw="text-right -space-y-1 flex flex-col">
                   <div
+                    tw="text-xl text-foreground italic flex"
                     style={{
-                      fontSize: 40,
-                      color: "#4b5563",
-                      marginBottom: "8px",
-                      fontFamily: '"Instrument Serif", serif',
-                      fontWeight: 400,
-                      fontStyle: "italic",
-                      letterSpacing: "0.01em",
-                      display: "flex",
+                      fontFamily: "var(--font-instrument-serif), serif",
                     }}
                   >
                     Sincerely,
                   </div>
                   <div
+                    tw="text-lg font-normal text-foreground flex"
                     style={{
-                      fontSize: 36,
-                      color: "#6b7280",
-                      fontFamily: '"Instrument Serif", serif',
-                      fontWeight: 400,
-                      letterSpacing: "0.01em",
-                      display: "flex",
+                      fontFamily: "var(--font-instrument-sans), sans-serif",
                     }}
                   >
                     Anonymous
@@ -304,27 +193,12 @@ export async function GET(
                 </div>
               </div>
             </div>
-
-            {/* Lost Letters branding */}
-            <div
-              style={{
-                position: "absolute",
-                top: "40px",
-                right: "60px",
-                fontSize: 32,
-                color: "#9ca3af",
-                fontWeight: 500,
-                display: "flex",
-              }}
-            >
-              Lost Letters
-            </div>
           </div>
         </div>
       ),
       {
-        width: 2400,
-        height: 1260,
+        width: 1200,
+        height: 630,
         fonts: [
           {
             name: "Instrument Serif",
@@ -334,33 +208,41 @@ export async function GET(
         ],
       }
     );
+
+    // Add cache headers with shorter cache time for testing
+    response.headers.set(
+      "Cache-Control",
+      "public, max-age=31536000, immutable"
+    );
+    response.headers.set("Content-Type", "image/png");
+    return response;
   } catch (error) {
     console.error("Error generating OG image:", error);
 
     // Simple error fallback
-    return new ImageResponse(
+    const errorResponse = new ImageResponse(
       (
         <div
-          style={{
-            background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 48,
-            fontWeight: 700,
-            color: "#2d3748",
-            fontFamily: "Instrument Sans, sans-serif",
-          }}
+          tw="w-full h-full flex items-center justify-center"
+          style={{ backgroundColor: "#f6fefb" }}
         >
-          <div style={{ display: "flex" }}>Lost Letters</div>
+          <div
+            tw="text-5xl font-bold text-foreground flex"
+            style={{ fontFamily: "var(--font-instrument-sans), sans-serif" }}
+          >
+            Lost Letters
+          </div>
         </div>
       ),
       {
-        width: 2400,
-        height: 1260,
+        width: 1200,
+        height: 630,
       }
     );
+
+    // Add cache headers
+    errorResponse.headers.set("Cache-Control", "public, max-age=3600");
+    errorResponse.headers.set("Content-Type", "image/png");
+    return errorResponse;
   }
 }

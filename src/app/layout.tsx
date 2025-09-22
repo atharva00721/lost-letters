@@ -18,6 +18,7 @@ const instrumentSerif = Instrument_Serif({
 
 /* ---------- metadata ---------- */
 export const metadata: Metadata = {
+  metadataBase: new URL("https://lostletters.arvie.tech"),
   title: "Lost Letters - Share Your Stories",
   description:
     "Lost Letters is a platform to share, discover, and save heartfelt letters from around the world.",
