@@ -45,7 +45,7 @@ export function SearchBar({
           value={searchTerm}
           onChange={(e) => onSearchTermChange(e.target.value)}
           onKeyDown={handleKeyPress}
-          className="pl-10 pr-4 py-2 h-11 transition-all"
+          className="pl-10 pr-4 py-2 h-11 rounded-full transition-all"
           aria-describedby="search-help"
         />
         <Search
@@ -69,7 +69,7 @@ export function SearchBar({
       <div className="flex gap-2">
         <Button
           onClick={onSearch}
-          className="px-6 h-11 font-medium transition-all"
+          className="px-6 h-11 rounded-full font-medium transition-all"
           disabled={isPending}
           type="button"
         >
@@ -85,7 +85,7 @@ export function SearchBar({
         <Button
           onClick={onRefresh}
           variant="neutral"
-          className="px-4 h-11 font-medium transition-all"
+          className="px-4 h-11 rounded-full font-medium transition-all"
           disabled={isPending}
           type="button"
           title="Find new letters (clears cache and refreshes)"
