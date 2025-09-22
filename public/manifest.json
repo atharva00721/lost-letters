@@ -1,0 +1,70 @@
+{
+    "name": "Lost Letters - Share Your Stories",
+    "short_name": "Lost Letters",
+    "description": "Share, discover, and save heartfelt letters from around the world. Write anonymous letters and connect through the power of words.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#10b981",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "en",
+    "categories": [
+        "lifestyle",
+        "social",
+        "entertainment"
+    ],
+    "icons": [
+        {
+            "src": "/favicon_io/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/favicon_io/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/favicon_io/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/LostLetters.png",
+            "sizes": "640x640",
+            "type": "image/png",
+            "form_factor": "narrow"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Write a Letter",
+            "short_name": "Write",
+            "description": "Write a new anonymous letter",
+            "url": "/writeLetter",
+            "icons": [
+                {
+                    "src": "/favicon_io/android-chrome-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Browse Letters",
+            "short_name": "Browse",
+            "description": "Read letters from the community",
+            "url": "/lostLetters",
+            "icons": [
+                {
+                    "src": "/favicon_io/android-chrome-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}

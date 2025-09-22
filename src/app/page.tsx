@@ -3,6 +3,47 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import LetterCount from "@/components/LetterCount";
 import MobileLandingPage from "@/components/ui/mobile";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Lost Letters - Share Your Stories",
+  description:
+    "Share a little love, one letter at a time. Write anonymously or discover sweet notes from others. Join our community of heartfelt letter writers.",
+  openGraph: {
+    title: "Lost Letters - Share Your Stories",
+    description:
+      "Share a little love, one letter at a time. Write anonymously or discover sweet notes from others.",
+    images: [
+      {
+        url: "/LostLetters.png",
+        width: 1200,
+        height: 630,
+        alt: "Lost Letters - Share Your Stories",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Lost Letters - Share Your Stories",
+    description:
+      "Share a little love, one letter at a time. Write anonymously or discover sweet notes from others.",
+    images: ["/LostLetters.png"],
+  },
+  other: {
+    "whatsapp:image": "/LostLetters.png",
+    "whatsapp:title": "Lost Letters - Share Your Stories",
+    "whatsapp:description":
+      "Share a little love, one letter at a time. Write anonymously or discover sweet notes from others.",
+    "discord:image": "/LostLetters.png",
+    "discord:title": "Lost Letters - Share Your Stories",
+    "discord:description":
+      "Share a little love, one letter at a time. Write anonymously or discover sweet notes from others.",
+    "reddit:image": "/LostLetters.png",
+    "reddit:title": "Lost Letters - Share Your Stories",
+    "reddit:description":
+      "Share a little love, one letter at a time. Write anonymously or discover sweet notes from others.",
+  },
+};
 
 export default function LandingPage() {
   return (

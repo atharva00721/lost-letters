@@ -169,12 +169,14 @@ export async function GET(
       }
     );
 
-    // Add cache headers with shorter cache time for testing
+    // Add optimized cache headers for WhatsApp
     response.headers.set(
       "Cache-Control",
-      "public, max-age=300, must-revalidate"
+      "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
     );
     response.headers.set("Content-Type", "image/png");
+    response.headers.set("X-Content-Type-Options", "nosniff");
+    response.headers.set("X-Frame-Options", "SAMEORIGIN");
     return response;
   } catch (error) {
     console.error("Error generating WhatsApp OG image:", error);

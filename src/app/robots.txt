@@ -4,4 +4,44 @@ Allow: /
 # Allow social media crawlers to access OG images
 Allow: /api/og/*
 
+# Disallow admin or private areas (if any)
+Disallow: /admin/
+Disallow: /api/auth/
+Disallow: /_next/
+Disallow: /api/letters/
+
+# Allow specific API endpoints for social sharing
+Allow: /api/og/
+Allow: /api/og/whatsapp/
+
+# Sitemap location
+Sitemap: https://lostletters.arvie.tech/sitemap.xml
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
+
+# Specific rules for social media crawlers
+User-agent: facebookexternalhit
+Allow: /
+Allow: /api/og/*
+
+User-agent: Twitterbot
+Allow: /
+Allow: /api/og/*
+
+User-agent: LinkedInBot
+Allow: /
+Allow: /api/og/*
+
+User-agent: WhatsApp
+Allow: /
+Allow: /api/og/whatsapp/*
+
+User-agent: DiscordBot
+Allow: /
+Allow: /api/og/*
+
+User-agent: redditbot
+Allow: /
+Allow: /api/og/*
 
