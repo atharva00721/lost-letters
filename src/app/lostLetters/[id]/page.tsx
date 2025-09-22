@@ -54,6 +54,9 @@ export async function generateMetadata({
       creator: "@codepaglu",
       site: "@codepaglu",
     },
+    other: {
+      "whatsapp:image": `/api/og/whatsapp/${id}`,
+    },
   };
 }
 
