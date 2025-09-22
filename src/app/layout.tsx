@@ -120,7 +120,12 @@ export const metadata: Metadata = {
     title: "Lost Letters - Share Your Stories",
     description:
       "Share, discover, and save heartfelt letters from around the world. Write anonymous letters and connect through the power of words.",
-    images: ["/LostLetters.png"],
+    images: [
+      {
+        url: "/LostLetters.png",
+        alt: "Lost Letters - Share Your Stories",
+      },
+    ],
   },
   alternates: {
     canonical: "https://lostletters.arvie.tech",
@@ -139,6 +144,15 @@ export const metadata: Metadata = {
     "msapplication-tooltip": "Share and discover heartfelt letters",
     "msapplication-starturl": "/",
     "msapplication-tap-highlight": "no",
+    // Twitter specific meta tags
+    "twitter:card": "summary_large_image",
+    "twitter:title": "Lost Letters - Share Your Stories",
+    "twitter:description":
+      "Share, discover, and save heartfelt letters from around the world. Write anonymous letters and connect through the power of words.",
+    "twitter:image": "/LostLetters.png",
+    "twitter:image:alt": "Lost Letters - Share Your Stories",
+    "twitter:creator": "@codepaglu",
+    "twitter:site": "@codepaglu",
     // Discord specific
     "discord:image": "/LostLetters.png",
     "discord:title": "Lost Letters - Share Your Stories",

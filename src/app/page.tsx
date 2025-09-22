@@ -27,17 +27,36 @@ export const metadata: Metadata = {
     title: "Lost Letters - Share Your Stories",
     description:
       "Share a little love, one letter at a time. Write anonymously or discover sweet notes from others.",
-    images: ["/LostLetters.png"],
+    images: [
+      {
+        url: "/LostLetters.png",
+        alt: "Lost Letters - Share Your Stories",
+      },
+    ],
+    creator: "@codepaglu",
+    site: "@codepaglu",
   },
   other: {
+    // Twitter specific meta tags
+    "twitter:card": "summary_large_image",
+    "twitter:title": "Lost Letters - Share Your Stories",
+    "twitter:description":
+      "Share a little love, one letter at a time. Write anonymously or discover sweet notes from others.",
+    "twitter:image": "/LostLetters.png",
+    "twitter:image:alt": "Lost Letters - Share Your Stories",
+    "twitter:creator": "@codepaglu",
+    "twitter:site": "@codepaglu",
+    // WhatsApp specific
     "whatsapp:image": "/LostLetters.png",
     "whatsapp:title": "Lost Letters - Share Your Stories",
     "whatsapp:description":
       "Share a little love, one letter at a time. Write anonymously or discover sweet notes from others.",
+    // Discord specific
     "discord:image": "/LostLetters.png",
     "discord:title": "Lost Letters - Share Your Stories",
     "discord:description":
       "Share a little love, one letter at a time. Write anonymously or discover sweet notes from others.",
+    // Reddit specific
     "reddit:image": "/LostLetters.png",
     "reddit:title": "Lost Letters - Share Your Stories",
     "reddit:description":

@@ -26,17 +26,36 @@ export const metadata: Metadata = {
     title: "Write a Letter - Lost Letters",
     description:
       "Share your thoughts, feelings, and stories anonymously. Write a heartfelt letter to someone special or to the world.",
-    images: ["/LostLetters.png"],
+    images: [
+      {
+        url: "/LostLetters.png",
+        alt: "Write a Letter - Lost Letters",
+      },
+    ],
+    creator: "@codepaglu",
+    site: "@codepaglu",
   },
   other: {
+    // Twitter specific meta tags
+    "twitter:card": "summary_large_image",
+    "twitter:title": "Write a Letter - Lost Letters",
+    "twitter:description":
+      "Share your thoughts, feelings, and stories anonymously. Write a heartfelt letter to someone special or to the world.",
+    "twitter:image": "/LostLetters.png",
+    "twitter:image:alt": "Write a Letter - Lost Letters",
+    "twitter:creator": "@codepaglu",
+    "twitter:site": "@codepaglu",
+    // WhatsApp specific
     "whatsapp:image": "/LostLetters.png",
     "whatsapp:title": "Write a Letter - Lost Letters",
     "whatsapp:description":
       "Share your thoughts, feelings, and stories anonymously. Write a heartfelt letter to someone special or to the world.",
+    // Discord specific
     "discord:image": "/LostLetters.png",
     "discord:title": "Write a Letter - Lost Letters",
     "discord:description":
       "Share your thoughts, feelings, and stories anonymously. Write a heartfelt letter to someone special or to the world.",
+    // Reddit specific
     "reddit:image": "/LostLetters.png",
     "reddit:title": "Write a Letter - Lost Letters",
     "reddit:description":

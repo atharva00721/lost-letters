@@ -69,7 +69,12 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: `Letter to ${recipient} - Lost Letters`,
       description: `Read an anonymous letter addressed to ${recipient}. ${letterPreview}`,
-      images: [`/api/og/${id}`],
+      images: [
+        {
+          url: `/api/og/${id}`,
+          alt: `Letter to ${recipient} - Lost Letters`,
+        },
+      ],
       creator: "@codepaglu",
       site: "@codepaglu",
     },
@@ -77,15 +82,27 @@ export async function generateMetadata({
       canonical: `https://lostletters.arvie.tech/lostLetters/${id}`,
     },
     other: {
+      // Twitter specific meta tags
+      "twitter:card": "summary_large_image",
+      "twitter:title": `Letter to ${recipient} - Lost Letters`,
+      "twitter:description": `Read an anonymous letter addressed to ${recipient}. ${letterPreview}`,
+      "twitter:image": `/api/og/${id}`,
+      "twitter:image:alt": `Letter to ${recipient} - Lost Letters`,
+      "twitter:creator": "@codepaglu",
+      "twitter:site": "@codepaglu",
+      // WhatsApp specific
       "whatsapp:image": `/api/og/whatsapp/${id}`,
       "whatsapp:title": `Letter to ${recipient} - Lost Letters`,
       "whatsapp:description": `Read an anonymous letter addressed to ${recipient}. ${letterPreview}`,
+      // Discord specific
       "discord:image": `/api/og/${id}`,
       "discord:title": `Letter to ${recipient} - Lost Letters`,
       "discord:description": `Read an anonymous letter addressed to ${recipient}. ${letterPreview}`,
+      // Reddit specific
       "reddit:image": `/api/og/${id}`,
       "reddit:title": `Letter to ${recipient} - Lost Letters`,
       "reddit:description": `Read an anonymous letter addressed to ${recipient}. ${letterPreview}`,
+      // Article specific
       "article:author": "Anonymous",
       "article:section": "Letters",
       "article:tag": recipient,
