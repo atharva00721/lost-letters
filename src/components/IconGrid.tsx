@@ -5,7 +5,7 @@ interface IconGridProps {
   size?: number;
   className?: string;
 }
-
+1
 export default function IconGrid({
   count = 6,
   size = 80,

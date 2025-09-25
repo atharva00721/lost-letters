@@ -1,6 +1,8 @@
 import { ImageResponse } from "next/og";
 import { getLetterById } from "@/actions/letter";
 import { formatLetterTitle } from "@/lib/utils";
+import { withApiProtection } from "@/lib/api-protection";
+import { withCache, getCacheHeaders } from "@/lib/cache";
 
 export const runtime = "nodejs";
 
@@ -23,7 +25,7 @@ async function loadGoogleFont(font: string, text: string) {
   throw new Error("failed to load font data");
 }
 
-export async function GET(
+async function handler(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -210,10 +212,10 @@ export async function GET(
     );
 
     // Add optimized cache headers
-    response.headers.set(
-      "Cache-Control",
-      "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
-    );
+    const cacheHeaders = getCacheHeaders("static");
+    Object.entries(cacheHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
     response.headers.set("Content-Type", "image/png");
     response.headers.set("X-Content-Type-Options", "nosniff");
     response.headers.set("X-Frame-Options", "SAMEORIGIN");
@@ -243,8 +245,23 @@ export async function GET(
     );
 
     // Add cache headers
-    errorResponse.headers.set("Cache-Control", "public, max-age=3600");
+    const errorCacheHeaders = getCacheHeaders("dynamic");
+    Object.entries(errorCacheHeaders).forEach(([key, value]) => {
+      errorResponse.headers.set(key, value);
+    });
     errorResponse.headers.set("Content-Type", "image/png");
     return errorResponse;
   }
 }
+
+// Export with protection and caching
+export const GET = withApiProtection(
+  withCache(handler, {
+    ttl: 24 * 60 * 60 * 1000, // 24 hours
+    keyGenerator: (request) => `og:${new URL(request.url).pathname}`,
+  }),
+  {
+    isWriteOperation: false,
+    maxBodySize: 1024 * 1024, // 1MB
+  }
+);

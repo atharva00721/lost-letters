@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     "twitter:image": "/LostLetters.png",
     "twitter:image:alt": "Lost Letters - Share Your Stories",
     "twitter:creator": "@codepaglu",
-    "twitter:site": "@codepaglu",
+    "twitter:site": "@codepaglu", 
     // WhatsApp specific
     "whatsapp:image": "/LostLetters.png",
     "whatsapp:title": "Lost Letters - Share Your Stories",
